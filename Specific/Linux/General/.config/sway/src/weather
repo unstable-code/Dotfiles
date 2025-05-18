@@ -31,10 +31,11 @@ elif [ $(cat $lock_file) -ge $(expr $refresh_interval \* 60) ]; then
     echo 0 > $lock_file
 else
     output=$(cat $prev_output)
-    if [ -z $prev_output ]; then
+    if [ -z "$output" ]; then
+        echo "(-$parse_err)" | tee $prev_output
         echo 0 > $lock_file
+    else
+        echo $output
+        echo $(expr $(cat $lock_file) + 1) > $lock_file
     fi
-
-    echo $output
-    echo $(expr $(cat $lock_file) + 1) > $lock_file
 fi
