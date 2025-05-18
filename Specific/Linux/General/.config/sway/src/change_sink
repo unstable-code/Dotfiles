@@ -18,7 +18,7 @@ function per_source() {
 	elif [[ $(pactl list sink-inputs | wc -l) -lt 1 ]]; then
 		rofi -e 'No players found.'
 	else
-        target_app=$(pactl list sink-inputs | grep -E '(Input|media\.name|application\.process\.binary|node\.driver-id)' | sed 's/Sink Input \#/I/' | sed 's/node.driver-id = /O/' | sed 's/.*application.process.binary =//' | sed 's/.*media.name =//' | sed 's/\"//g' | xargs | sed 's/I/\nI/g' | sed '1d' | awk '{first=$1; last=$NF; $1=""; $NF=""; sub(/^ /, "", $0); print first, last, $0}' | rofi -dmenu -p "Choose program (cnt.$current_sink)" | sed -E 's/(I|O)//g' | awk '{ print $1 " " $2 }')
+        target_app=$(pactl list sink-inputs | grep -E '(Input|media\.name|application\.process\.binary|node\.driver-id)' | sed 's/Sink Input \#/I/' | sed 's/node.driver-id = /O/' | sed 's/.*application.process.binary =//' | sed 's/.*media.name =//' | sed 's/\"//g' | xargs | sed 's/^I/\nI/g' | sed '1d' | awk '{first=$1; last=$NF; $1=""; $NF=""; sub(/^ /, "", $0); print first, last, $0}' | rofi -dmenu -p "Choose program (cnt.$current_sink)" | sed -E 's/(I|O)//g' | awk '{ print $1 " " $2 }')
 		if [[ -z "$target_app" ]]; then
 			return $?
 		else
