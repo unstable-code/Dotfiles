@@ -5,3 +5,5 @@ Icon
 history.xml
 session.ini
 tabs.xml
+*.err
+*.tmp
