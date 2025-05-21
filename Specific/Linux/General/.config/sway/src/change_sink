@@ -36,9 +36,9 @@ function change_sink_volumes() {
         if [ -z "$sinks" ]; then
             return $?
         fi
-		pactl set-sink-volume $sinks $(rofi -dmenu -mesg "New volumes (cnt. $(pactl get-sink-volume $sinks | awk '{ print $5 }'))&#x0a;0 50 ±5" | sed 's/%//g')%
+		pactl set-sink-volume $sinks $(rofi -dmenu -mesg "New volumes (cnt. $(pactl get-sink-volume $sinks | awk '{ print $5 }'))&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')%
 	else
-		pactl set-sink-volume \@DEFAULT_SINK@ $(rofi -dmenu -mesg "New DEFAULT_SINK volumes (cnt. $(pactl get-sink-volume \@DEFAULT_SINK@ | awk '{ print $5 }'))&#x0a;0 50 ±5" | sed 's/%//g')%
+		pactl set-sink-volume \@DEFAULT_SINK@ $(rofi -dmenu -mesg "New DEFAULT_SINK volumes (cnt. $(pactl get-sink-volume \@DEFAULT_SINK@ | awk '{ print $5 }'))&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')%
 	fi
 }
 
