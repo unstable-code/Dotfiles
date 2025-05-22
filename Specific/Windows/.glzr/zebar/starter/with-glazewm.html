@@ -147,7 +147,7 @@
             <div className="right">
               {output.media && output.media.currentSession && (
                 <div className="media">
-                    [ {!output.media.currentSession.title ? 'N/A' : output.media.currentSession.title.substr(0, 18)}&nbsp;
+                    [ {!output.media.currentSession.title ? 'N/A' : output.media.currentSession.title.substr(0, 16)}&nbsp;
                     {output.media.currentSession.isPlaying ? '▶' : '⏸'}&nbsp;
                     {output.media.currentSession.sessionId.replace('.exe', '').substr(0, 4)} |&nbsp;
                     {Math.round(output.media.currentSession.position / output.media.currentSession.endTime * 100)}% ]&nbsp;
@@ -234,7 +234,7 @@
                 <div className="weather">
                   {getWeatherIcon(output.weather)}
                   {Math.round(output.weather.celsiusTemp)}°C ㅣ&nbsp;
-                  {output.weather.windSpeed}m/s
+                  {Math.round(output.weather.windSpeed)}m/s
                 </div>
               )}
             </div>
