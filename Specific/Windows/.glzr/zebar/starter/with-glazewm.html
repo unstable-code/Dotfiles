@@ -155,7 +155,7 @@
               )}
               {output.audio && (
                 <div className="audio">
-                    [ {output.audio.defaultPlaybackDevice.name.substr(0, 10)}&nbsp;
+                    [ {output.audio.defaultPlaybackDevice.name.substr(0, 8)}&nbsp;
                     {output.audio.defaultPlaybackDevice.volume}% ]&nbsp;
                 </div>
               )}
@@ -233,8 +233,8 @@
               {output.weather && (
                 <div className="weather">
                   {getWeatherIcon(output.weather)}
-                  {Math.round(output.weather.celsiusTemp)}°C
-                  ㅣ{output.weather.windSpeed}m/s
+                  {Math.round(output.weather.celsiusTemp)}°C ㅣ&nbsp;
+                  {output.weather.windSpeed}m/s
                 </div>
               )}
             </div>
