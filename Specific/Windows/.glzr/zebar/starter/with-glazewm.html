@@ -234,7 +234,7 @@
                 <div className="weather">
                   {getWeatherIcon(output.weather)}
                   {Math.round(output.weather.celsiusTemp)}°C ㅣ&nbsp;
-                  {Math.round(output.weather.windSpeed)}m/s
+                  {(output.weather.windSpeed / 3.6).toFixed(1)}m/s
                 </div>
               )}
             </div>
