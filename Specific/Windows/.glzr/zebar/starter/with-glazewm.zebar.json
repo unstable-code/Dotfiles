@@ -16,7 +16,7 @@
   "presets": [
     {
       "name": "default",
-      "anchor": "top_center",
+      "anchor": "bottom_center",
       "offsetX": "0px",
       "offsetY": "0px",
       "width": "100%",
