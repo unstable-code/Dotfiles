@@ -149,7 +149,7 @@
                 <div className="media">
                     [ {!output.media.currentSession.title ? 'N/A' : output.media.currentSession.title.substr(0, 16)}&nbsp;
                     {output.media.currentSession.isPlaying ? '▶' : '⏸'}&nbsp;
-                    {output.media.currentSession.sessionId.replace('.exe', '').substr(0, 4)} |&nbsp;
+                    {output.media.allSessions.length == 1 ? output.media.currentSession.sessionId.replace('.exe', '').substr(0, 4) : output.media.allSessions.length} |&nbsp;
                     {Math.round(output.media.currentSession.position / output.media.currentSession.endTime * 100)}% ]&nbsp;
                 </div>
               )}
