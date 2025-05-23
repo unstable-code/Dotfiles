@@ -145,18 +145,19 @@
             <div className="center"><b>{output.date?.formatted}</b></div>
 
             <div className="right">
-              {output.media && output.media.currentSession && (
-                <div className="media">
-                    [ {!output.media.currentSession.title ? 'N/A' : output.media.currentSession.title.substr(0, 16)}&nbsp;
-                    {output.media.currentSession.isPlaying ? '▶' : '⏸'}&nbsp;
-                    {output.media.allSessions.length == 1 ? output.media.currentSession.sessionId.replace('.exe', '').substr(0, 4) : output.media.allSessions.length} |&nbsp;
-                    {Math.round(output.media.currentSession.position / output.media.currentSession.endTime * 100)}% ]&nbsp;
+              {output.audio && !output.media.currentSession && (
+                <div className="audio">
+                    [ {output.audio.defaultPlaybackDevice.name.substr(0, 8)} 🔊&nbsp;
+                    {output.audio.defaultPlaybackDevice.volume}% ]&nbsp;
                 </div>
               )}
-              {output.audio && (
+              {output.audio && output.media && output.media.currentSession && (
                 <div className="audio">
-                    [ {output.audio.defaultPlaybackDevice.name.substr(0, 8)}&nbsp;
-                    {output.audio.defaultPlaybackDevice.volume}% ]&nbsp;
+                    [ {output.audio.defaultPlaybackDevice.name.substr(0, 8)} 🔊&nbsp;
+                    {output.audio.defaultPlaybackDevice.volume}%&nbsp;
+                    {output.media.currentSession.isPlaying ? '▶' : '⏸'}&nbsp;
+                    {output.media.allSessions.length == 1 ? output.media.currentSession.sessionId.replace('.exe', '').substr(0, 4) : output.media.allSessions.length}&nbsp;
+                    {Math.round(output.media.currentSession.position / output.media.currentSession.endTime * 100)}% ]&nbsp;
                 </div>
               )}
               {output.glazewm && (
