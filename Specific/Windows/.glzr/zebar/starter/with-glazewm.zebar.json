@@ -5,7 +5,7 @@
   "shownInTaskbar": false,
   "focused": false,
   "resizable": false,
-  "transparent": false,
+  "transparent": true,
   "caching": {
     "defaultDuration": 604800,
     "rules": []
@@ -16,11 +16,11 @@
   "presets": [
     {
       "name": "default",
-      "anchor": "top_left",
+      "anchor": "top_center",
       "offsetX": "0px",
       "offsetY": "0px",
       "width": "100%",
-      "height": "40px",
+      "height": "30px",
       "monitorSelection": {
         "type": "all"
       },
