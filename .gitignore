@@ -7,4 +7,5 @@ session.ini
 tabs.xml
 *.err
 *.tmp
+*.log
 *tmp*
