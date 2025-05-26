@@ -41,15 +41,35 @@ function output() {
     elif [ -z "$(playerctl --player playerctld status | grep -v Stopped)" ]; then
         echo ''
     elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
-        echo 'N/A'
+        echo 'N/A '
+        progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+        if [ -z "$progress" ]; then
+            echo 'NaN%'
+        else
+            echo "$progress%"
+        fi
     else
         if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
             echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)
+            echo ' '
+            progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+            if [ -z "$progress" ]; then
+                echo 'NaN%'
+            else
+                echo "$progress%"
+            fi
         else
             if [ $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
                 echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $2 }')
             else
                 echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
+            fi
+            echo ' '
+            progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+            if [ -z "$progress" ]; then
+                echo 'NaN%'
+            else
+                echo "$progress%"
             fi
         fi
     fi
@@ -72,7 +92,7 @@ function output() {
             echo $(mbpfan get name | cut -c 1-3)
         else
             echo ' 🪭 '
-            echo $(python3 -c "print ($(sensors -u $2 | grep fan1_input | awk '{ print $2 }') / $(sensors -u $2 | grep fan1_max | awk '{ print $2 }') * 100)" | cut -d. -f1)%;
+            echo $(python -c "print ($(sensors -u $2 | grep fan1_input | awk '{ print $2 }') / $(sensors -u $2 | grep fan1_max | awk '{ print $2 }') * 100)" | cut -d. -f1)%;
         fi
     fi
     echo ' ] '
@@ -112,7 +132,7 @@ function output() {
         python -c "print($(brightnessctl get) / $(brightnessctl max) * 100)" | cut -d. -f1
         if [ $(brightnessctl --device='smc::kbd_backlight' get) -gt 0 ]; then
             echo '% | '
-            echo $(python3 -c "print ($(brightnessctl --device='smc::kbd_backlight' get) / $(brightnessctl --device='smc::kbd_backlight' max) * 100)" | cut -d. -f1)%
+            echo $(python -c "print ($(brightnessctl --device='smc::kbd_backlight' get) / $(brightnessctl --device='smc::kbd_backlight' max) * 100)" | cut -d. -f1)%
             echo ' ] '
         else
             echo '% ] '
