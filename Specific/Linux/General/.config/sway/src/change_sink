@@ -70,8 +70,13 @@ function check_current_state() {
 ########    DO NOT CHANGE OR REMOVE BELOW LINES    ########
 #   This script will not work after changing below code   #
 ###########################################################
-if [ $# -eq 0 ]; then                                     #
-	echo "usage: $0 <function [options]>" >&2             #
-	exit 127                                              #
-else "${@}"; fi                                           #
+if [ $# -eq 0 ]; then
+	echo "usage: $0 <function [options]>" >&2
+	exit 127
+else
+    "${@}"
+    if [ $? -ne 0 ]; then
+        echo "$0 $@" | swaynag -e bottom -y background -lm "backend: An error ocurred when executing \`$1\`."
+    fi
+fi
 ###########################################################
