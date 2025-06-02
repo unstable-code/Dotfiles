@@ -40,7 +40,8 @@ else
         if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
             echo $output
         else
-            stat -c "%y" /tmp/widget-sway-weather.log | cut -d. -f1 | sed 's/^[0-9][0-9]/🗘 /'
+            elapsed_time=$(python -c "print($(cat $lock_file) / ($refresh_interval * 60) * 100)" | cut -d. -f1)
+            stat -c "%y" $prev_output | cut -d. -f1 | sed "s/^[0-9][0-9][0-9][0-9]-/🗘 $elapsed_time% /"
         fi
         echo $(expr $(cat $lock_file) + 1) > $lock_file
     fi
