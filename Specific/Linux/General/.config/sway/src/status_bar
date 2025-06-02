@@ -1,5 +1,23 @@
 #!/bin/bash
 
+function media_progress() {
+    if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+        progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+        if [ -z "$progress" ]; then
+            echo '--%'
+        else
+            echo "$progress%"
+        fi
+    else
+        progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+        if [ -z "$progress" ]; then
+            echo '--:--'
+        else
+            python -c "from datetime import timedelta as td; data = $(playerctl metadata --format '{{mpris:length}}') - $(playerctl metadata --format '{{position}}'); print(td(microseconds=data))" | cut -d. -f1 | sed 's/^0://' | sed 's/^0//' | sed 's/^/-/'
+        fi
+    fi
+}
+
 function output() {
     if [ $(cat /sys/class/leds/input*::capslock/brightness | head -n 1) -eq 1 ]; then
         echo '[ ⚠️ CAPS ] '
@@ -42,22 +60,12 @@ function output() {
         echo ''
     elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
         echo 'N/A '
-        progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
-        if [ -z "$progress" ]; then
-            echo 'NaN%'
-        else
-            echo "$progress%"
-        fi
+        media_progress
     else
         if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
             echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)
             echo ' '
-            progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
-            if [ -z "$progress" ]; then
-                echo 'NaN%'
-            else
-                echo "$progress%"
-            fi
+            media_progress
         else
             if [ $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
                 echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $2 }')
@@ -65,12 +73,7 @@ function output() {
                 echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
             fi
             echo ' '
-            progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
-            if [ -z "$progress" ]; then
-                echo 'NaN%'
-            else
-                echo "$progress%"
-            fi
+            media_progress
         fi
     fi
     echo ' ] ['
