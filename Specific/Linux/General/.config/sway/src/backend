@@ -13,28 +13,34 @@ function logout() {
 }
 
 function power() {
-    input=$(notify_send --action='1=⏾' --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
+    enter_sleep 'test'
+    if [ $? -ne 127 ]; then
+        input=$(notify_send --action='1=⏾' --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
+    else
+        input=$(notify_send --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
+    fi
+
     if [[ -n $input && $input -eq 1 ]]; then
-        ~/.config/sway/src/backend 'enter_sleep' 'test'
+        enter_sleep 'test'
         target=$?
         if [ $target -eq 0 ]; then
             input=$(notify_send --action="0=Mask sleep.target" --action='1=Sleep' 'Power' 'Configuring sleep function.')
             if [ $input -eq 1 ]; then
-                setsid ~/.config/sway/src/backend "lock_session" && sleep 1 && ~/.config/sway/src/backend "enter_sleep"
+                setsid ~/.config/sway/src/backend "lock_session" && sleep 1 && enter_sleep
                 return 0
             fi
         elif [ $target -eq 1 ]; then
             input=$(notify_send --action="1=Unmask sleep.target" 'Power' 'unable to run sleep operation. reason: sleep.target was masked.')
         elif [ $target -eq 2 ]; then
-            input=$(notify_send --action="1=Unmask $(~/.config/sway/src/backend 'enter_sleep' 'current').target" 'Power' "unable to run sleep operation. reason: $(~/.config/sway/src/backend 'enter_sleep' 'current').target was masked.")
+            input=$(notify_send --action="1=Unmask $(enter_sleep 'current').target" 'Power' "unable to run sleep operation. reason: $(enter_sleep 'current').target was masked.")
         fi
         if [[ -n $input && $input -eq 1 ]]; then
             if [ $target -eq 1 ]; then
                 $term -F sudo systemctl unmask sleep.target
-                ~/.config/sway/src/backend 'power'
+                power
             elif [ $target -eq 2 ]; then
-                $term -F sudo systemctl unmask $(~/.config/sway/src/backend 'enter_sleep' 'current').target
-                ~/.config/sway/src/backend 'power'
+                $term -F sudo systemctl unmask $(enter_sleep 'current').target
+                power
             fi
         elif [[ -n $input && $input -eq 0 ]]; then
             $term -F sudo systemctl mask sleep.target
@@ -64,7 +70,7 @@ function change_wallpaper() {
 }
 
 function lock_session() {
-    target_splash=$(~/.config/sway/src/backend 'change_wallpaper')
+    target_splash=$(change_wallpaper)
     if [ $? -ne 0 ]; then
         echo 'unable to load splash image.' >&2
         return 1
@@ -83,7 +89,10 @@ function lock_session() {
 
 function enter_sleep() {
     if [ "$1" == 'test' ]; then
-        if ! [ "$(systemctl is-enabled sleep.target)" == 'masked' ]; then
+        if [ "$(systemctl is-enabled sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target | grep -c static)" -eq 0 ]; then
+            logger --tag sway --priority user.notice 'backend: sleep.target was masked. Skipping `enter_sleep` operation.'
+            return 127
+        elif ! [ "$(systemctl is-enabled sleep.target)" == 'masked' ]; then
             # NOTE: To change SleepOperation features, please enter below commands and reboot to changes take effect.
             # `echo 'SleepOperation=suspend' | sudo tee /etc/systemd/logind.conf.d/sleep-operation.conf`
             # applicable sleep targets in SleepOperation: suspend, suspend-then-hibernate, hibernate, hybrid-sleep
@@ -103,7 +112,7 @@ function enter_sleep() {
     elif [ "$1" == 'current' ]; then
         find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//'
     else
-        ~/.config/sway/src/backend 'enter_sleep' 'test'
+        enter_sleep 'test'
         if [ $? -eq 0 ]; then
             systemctl sleep
         else
