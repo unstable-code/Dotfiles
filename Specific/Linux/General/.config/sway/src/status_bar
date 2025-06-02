@@ -63,7 +63,8 @@ function output() {
     elif [ -z "$(playerctl --player playerctld status | grep -v Stopped)" ]; then
         echo ''
     elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
-        echo 'N/A '
+        echo $(playerctl --player playerctld metadata -f '{{mpris:trackid}}' | sed "s/'//" | awk -F '/' '{ print $3 }')
+        echo ' '
         media_progress
     else
         if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
