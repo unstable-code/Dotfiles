@@ -37,7 +37,11 @@ else
         echo "$man_url (-$parse_err)" | tee $prev_output
         echo 0 > $lock_file
     else
-        echo $output
+        if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+            echo $output
+        else
+            stat -c "%y" /tmp/widget-sway-weather.log | cut -d. -f1 | sed 's/^[0-9][0-9]/🗘 /'
+        fi
         echo $(expr $(cat $lock_file) + 1) > $lock_file
     fi
 fi
