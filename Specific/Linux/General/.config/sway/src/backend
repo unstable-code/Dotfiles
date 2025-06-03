@@ -154,11 +154,10 @@ function media_controller() {
     media_info="$(current_playing_media)"
     if [ $? -ne 0 ]; then
         notify_send -et 7000 'Media Controller' 'No players found'
-        return 1
+        return 0
     fi
 
     if [ $(playerctl -a status | grep -v Stopped | wc -l) -gt 1 ]; then
-
         if [ "$1" == "notify" ]; then
             input=$(notify_send --action='1=⏮' --action="2=⏯" --action='3=⏭' 'Media Controller' "$media_info")
             if [[ -n $input ]]; then
@@ -174,33 +173,37 @@ function media_controller() {
             mode='⏯'
             input=2
         fi
-
         if [ -z $input ]; then
-            return 1
-        fi
-        target_input=$(echo -e "$(if [ $(playerctl -a status | grep -v Stopped | wc -l) -gt 1 ]; then echo 'ALL\n'; fi)$(playerctl -a metadata --format '{{playerName}}: {{status}} [{{duration(position)}}/{{duration(mpris:length)}}]')" | rofi -dmenu -p "Pressed $mode button" | awk -F ':' '{ print $1 }')
-        if [ -z $target_input ]; then
-            return 1
+            return 0
         fi
 
-        if [[ -n $input && $input -eq 1 ]]; then
-            if [ "$target_input" == 'ALL' ]; then
-                playerctl -a previous
-            else
-                playerctl -p $target_input previous
+        if [ "$1" == "notify" ]; then
+            target_input=$(echo -e "$(if [ $(playerctl -a status | grep -v Stopped | wc -l) -gt 1 ]; then echo 'ALL\n'; fi)$(playerctl -a metadata --format '{{playerName}}: {{status}} [{{duration(position)}}/{{duration(mpris:length)}}]')" | rofi -dmenu -p "Pressed $mode button" | awk -F ':' '{ print $1 }')
+            if [ -z $target_input ]; then
+                return 0
             fi
-        elif [[ -n $input && $input -eq 2 ]]; then
-            if [ "$target_input" == 'ALL' ]; then
-                playerctl -a play-pause
-            else
-                playerctl -p $target_input play-pause
+
+            if [[ -n $input && $input -eq 1 ]]; then
+                if [ "$target_input" == 'ALL' ]; then
+                    playerctl -a previous
+                else
+                    playerctl -p $target_input previous
+                fi
+            elif [[ -n $input && $input -eq 2 ]]; then
+                if [ "$target_input" == 'ALL' ]; then
+                    playerctl -a play-pause
+                else
+                    playerctl -p $target_input play-pause
+                fi
+            elif [[ -n $input && $input -eq 3 ]]; then
+                if [ "$target_input" == 'ALL' ]; then
+                    playerctl -a next
+                else
+                    playerctl -p $target_input next
+                fi
             fi
-        elif [[ -n $input && $input -eq 3 ]]; then
-            if [ "$target_input" == 'ALL' ]; then
-                playerctl -a next
-            else
-                playerctl -p $target_input next
-            fi
+        else
+            playerctl play-pause
         fi
     else
         if [ "$1" == "notify" ]; then
@@ -248,7 +251,6 @@ function sinks_controller() {
         fi
     else
         input=$(notify_send --action='1=Volume' --action="2=$(if [ $(amixer get Master | grep 'Left' | grep '%' | awk '{ print $6 }' | tr -d \[ | tr -d \]) == 'on' ]; then echo 'Mute'; else echo 'UnMute'; fi)" --action='3=pavucontrol' 'Volume Control' "$(current_sink_status && pactl get-default-sink)")
-        echo $input
         if [[ -n $input && $input -eq 1 ]]; then
             ~/.config/sway/src/change_sink 'change_sink_volumes'
         elif [[ -n $input && $input -eq 2 ]]; then

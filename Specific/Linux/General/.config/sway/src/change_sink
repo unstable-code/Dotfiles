@@ -10,6 +10,7 @@ function default() {
 	else
         pactl set-default-sink $(echo "$sinks_list" | rofi -dmenu -p "Set sinks (cnt.$current_sink)" | awk '{ print $2 }') 2> /dev/null
 	fi
+    return 0
 }
 
 function per_source() {
@@ -20,7 +21,7 @@ function per_source() {
 	else
         target_app=$(pactl list sink-inputs | grep -E '(Input|media\.name|application\.process\.binary|Sink:)' | sed 's/Sink Input \#/I/' | sed 's/Sink: /O/' | sed 's/.*application.process.binary =//' | sed 's/.*media.name =//' | sed 's/\"//g' | xargs | sed 's/^I/\nI/g' | sed '1d' | rofi -dmenu -p "Choose program (cnt.$current_sink)" | sed -E 's/(I|O)//g' | awk '{ print $1 " " $2 }')
 		if [[ -z "$target_app" ]]; then
-			return $?
+			return 0
 		else
 			target_id=$(echo $target_app | awk '{ print $1 }')
 			target_prev_source=$(echo $target_app | awk '{ print $2 }')
@@ -28,18 +29,20 @@ function per_source() {
         target_source=$(echo "$sinks_list" | rofi -dmenu -p "$(pactl list sink-inputs | grep -E '(Input|Sink:|Sink Input)' | sed 's/\"//g' | grep -A1 $target_id | grep -v $target_id | sed 's/Sink: /Set new sinks (cnt\./')" | awk '{ print $2 }')
 		pactl move-sink-input $target_id $target_source
 	fi
+    return 0
 }
 
 function change_sink_volumes() {
 	if [[ $(check_current_state 'sinks') -gt 1 ]]; then
 		sinks=$(echo "$sinks_list" | rofi -dmenu -p "Choose sinks (cnt.$current_sink)" | awk '{ print $2 }')
         if [ -z "$sinks" ]; then
-            return $?
+            return 0
         fi
 		pactl set-sink-volume $sinks $(rofi -dmenu -mesg "New volumes (cnt. $(pactl get-sink-volume $sinks | awk '{ print $5 }'))&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')%
 	else
 		pactl set-sink-volume \@DEFAULT_SINK@ $(rofi -dmenu -mesg "New DEFAULT_SINK volumes (cnt. $(pactl get-sink-volume \@DEFAULT_SINK@ | awk '{ print $5 }'))&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')%
 	fi
+    return 0
 }
 
 function sink_mute_toggles() {
@@ -48,6 +51,7 @@ function sink_mute_toggles() {
 	else
 		pactl set-sink-mute \@DEFAULT_SINK@ toggle
 	fi
+    return 0
 }
 
 function current_source() {
