@@ -26,8 +26,12 @@ function power() {
         if [ $target -eq 0 ]; then
             input=$(notify_send --action="0=Mask sleep.target" --action='1=Sleep' 'Power' 'Configuring sleep function.')
             if [ $input -eq 1 ]; then
-                setsid ~/.config/sway/src/backend "lock_session" && sleep 1 && enter_sleep
-                return $?
+                enter_sleep
+                if [ $? -ne 0 ]; then
+                    return 1
+                else
+                    ~/.config/sway/src/backend "lock_session"
+                fi
             fi
         elif [ $target -eq 1 ]; then
             input=$(notify_send --action="1=Unmask sleep.target" 'Power' 'unable to run sleep operation. reason: sleep.target was masked.')
