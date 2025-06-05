@@ -27,7 +27,7 @@ function power() {
             input=$(notify_send --action="0=Mask sleep.target" --action='1=Sleep' 'Power' 'Configuring sleep function.')
             if [ $input -eq 1 ]; then
                 setsid ~/.config/sway/src/backend "lock_session" && sleep 1 && enter_sleep
-                return 0
+                return $?
             fi
         elif [ $target -eq 1 ]; then
             input=$(notify_send --action="1=Unmask sleep.target" 'Power' 'unable to run sleep operation. reason: sleep.target was masked.')
@@ -115,6 +115,7 @@ function enter_sleep() {
         enter_sleep 'test'
         if [ $? -eq 0 ]; then
             systemctl sleep
+            if [ $? -ne 0 ]; then return 1; fi
         else
             return 1
         fi
