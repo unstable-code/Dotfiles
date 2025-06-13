@@ -33,6 +33,7 @@ elif [ $(cat $lock_file) -ge $(expr $refresh_interval \* 60) ]; then
     echo 0 > $lock_file
 else
     output=$(cat $prev_output)
+    output=$(echo $output | sed 's/^[A-Z].*//')
     if [ -z "$output" ]; then
         echo "$man_url (-$parse_err)" | tee $prev_output
         echo 0 > $lock_file
