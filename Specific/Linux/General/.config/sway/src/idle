@@ -1,5 +1,7 @@
 #!/bin/sh
 
+### Idle configuration
+#
 # Example configuration:
 #
 # exec swayidle -w \
