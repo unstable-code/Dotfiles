@@ -1,19 +1,22 @@
 #!/bin/bash
 
 function media_progress() {
-    if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
-        progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
-        if [ -z "$progress" ]; then
-            echo '--%'
+    if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
+        echo ' '
+        if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+            progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+            if [ -z "$progress" ]; then
+                echo '--%'
+            else
+                echo "$progress%"
+            fi
         else
-            echo "$progress%"
-        fi
-    else
-        progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
-        if [ -z "$progress" ]; then
-            echo '--:--'
-        else
-            python -c "from datetime import timedelta as td; data = $(playerctl metadata --format '{{mpris:length}}') - $(playerctl metadata --format '{{position}}'); print(td(microseconds=data))" | cut -d. -f1 | sed 's/^0://' | sed 's/^0//' | sed 's/^/-/'
+            progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
+            if [ -z "$progress" ]; then
+                echo '--:--'
+            else
+                python -c "from datetime import timedelta as td; data = $(playerctl metadata --format '{{mpris:length}}') - $(playerctl metadata --format '{{position}}'); print(td(microseconds=data))" | cut -d. -f1 | sed 's/^0://' | sed 's/^0//' | sed 's/^/-/'
+            fi
         fi
     fi
 }
@@ -64,12 +67,10 @@ function output() {
         echo ''
     elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
         echo $(playerctl --player playerctld metadata -f '{{mpris:trackid}}' | sed "s/'//" | awk -F '/' '{ print $3 }')
-        echo ' '
         media_progress
     else
         if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
             echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)
-            echo ' '
             media_progress
         else
             if [ $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
@@ -77,7 +78,6 @@ function output() {
             else
                 echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
             fi
-            echo ' '
             media_progress
         fi
     fi
