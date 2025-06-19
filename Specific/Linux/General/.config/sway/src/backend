@@ -24,7 +24,7 @@ function power() {
         enter_sleep 'test'
         target=$?
         if [ $target -eq 0 ]; then
-            input=$(notify_send --action="0=Mask sleep.target" --action='1=Sleep' 'Power' 'Configuring sleep function.')
+            input=$(notify_send --action="0=Mask sleep.target" --action="1=$(enter_sleep 'current')" 'Power' 'Configuring sleep function.')
             if [ $input -eq 1 ]; then
                 enter_sleep
                 if [ $? -ne 0 ]; then
@@ -108,13 +108,21 @@ function enter_sleep() {
             if [ -n "$vailed_target" -a "$(systemctl is-enabled $vailed_target.target)" == 'masked' ]; then
                 logger --tag sway --priority user.notice "backend: $vailed_target.target was masked. Skipping \`enter_sleep\` operation."
                 return 2
+            elif [ -z "$vailed_target" -a "$(systemctl is-enabled suspend.target)" == 'masked' ]; then
+                logger --tag sway --priority user.notice "backend: suspend.target was masked. Skipping \`enter_sleep\` operation."
+                return 2
             fi
         else
             logger --tag sway --priority user.notice 'backend: sleep.target was masked. Skipping `enter_sleep` operation.'
             return 1
         fi
     elif [ "$1" == 'current' ]; then
-        find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//'
+        result=$(find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//')
+        if [ -z "$result" ]; then
+            echo 'suspend'
+        else
+            echo $result
+        fi
     else
         enter_sleep 'test'
         if [ $? -eq 0 ]; then
