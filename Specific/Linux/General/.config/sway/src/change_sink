@@ -35,12 +35,29 @@ function per_source() {
 function change_sink_volumes() {
 	if [[ $(check_current_state 'sinks') -gt 1 ]]; then
 		sinks=$(echo "$sinks_list" | rofi -dmenu -p "Choose sinks (cnt.$current_sink)" | awk '{ print $2 }')
-        if [ -z "$sinks" ]; then
-            return 0
+        if [ -z "$sinks" ]; then return 0; fi
+
+        cnt_volumes=$(pactl get-sink-volume $sinks | head -n 1 | awk '{ print $5 }' | sed 's/%//g')
+        new_volumes=$(rofi -dmenu -mesg "New $sinks volumes (cnt. $cnt_volumes%)&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')
+		pactl set-sink-volume $sinks $new_volumes%
+
+        cnt_volumes=$(pactl get-sink-volume $sinks | head -n 1 | awk '{ print $5 }' | sed 's/%//g')
+        if [ $cnt_volumes -gt 100 ]; then
+            pactl set-sink-volume $sinks 100%
+        elif [ $cnt_volumes -lt 0 ]; then
+            pactl set-sink-volume $sinks 0%
         fi
-		pactl set-sink-volume $sinks $(rofi -dmenu -mesg "New volumes (cnt. $(pactl get-sink-volume $sinks | awk '{ print $5 }'))&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')%
 	else
-		pactl set-sink-volume \@DEFAULT_SINK@ $(rofi -dmenu -mesg "New DEFAULT_SINK volumes (cnt. $(pactl get-sink-volume \@DEFAULT_SINK@ | awk '{ print $5 }'))&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')%
+        cnt_volumes=$(pactl get-sink-volume \@DEFAULT_SINK@ | head -n 1 | awk '{ print $5 }' | sed 's/%//g')
+        new_volumes=$(rofi -dmenu -mesg "New @DEFAULT_SINK@ volumes (cnt. $cnt_volumes%)&#x0a;0 70.5 50 ±5 ±2.5" | sed 's/%//g')
+		pactl set-sink-volume \@DEFAULT_SINK@ $new_volumes%
+
+        cnt_volumes=$(pactl get-sink-volume \@DEFAULT_SINK@ | head -n 1 | awk '{ print $5 }' | sed 's/%//g')
+        if [ $cnt_volumes -gt 100 ]; then
+            pactl set-sink-volume \@DEFAULT_SINK@ 100%
+        elif [ $cnt_volumes -lt 0 ]; then
+            pactl set-sink-volume \@DEFAULT_SINK@ 0%
+        fi
 	fi
     return 0
 }
