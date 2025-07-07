@@ -97,7 +97,7 @@ if [ $# -eq 0 ]; then
 else
     "${@}"
     if [ $? -ne 0 ]; then
-        echo "$0 $@" | swaynag -e bottom -y background -lm "backend: An error ocurred when executing \`$1\`."
+        echo "$0 $@" | swaynag -e bottom -y background -lm "backend: An error occurred while executing \`$1\`."
     fi
 fi
 ###########################################################

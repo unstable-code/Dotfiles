@@ -325,7 +325,8 @@ else
     "${@}"
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "File $0, line $exit_code, in $@" | swaynag -e bottom -y background -lm "backend: An error ocurred when executing \`$1\`."
+        preview=$(cat $0 | nl -b a -n ln | grep -A 7 -B 13 -E "^$exit_code" | sed "/$(expr $exit_code - 1)/s/$/\t\t\t\t\t⟵  BREAKPOINT: exception occurred line $(expr $exit_code - 1)/")
+        echo -e "File $0, line $exit_code, in $@\n$preview" | swaynag -e bottom -y background -lm "backend: An error occurred while executing \`$1\`."
     fi
 fi
 ###########################################################
