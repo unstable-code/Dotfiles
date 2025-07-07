@@ -14,7 +14,7 @@ function logout() {
 
 function power() {
     enter_sleep 'test'
-    if [ $? -ne 127 ]; then
+    if [ $? -ne 3 ]; then
         input=$(notify_send --action='1=⏾' --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
     else
         input=$(notify_send --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
@@ -28,7 +28,7 @@ function power() {
             if [ $input -eq 1 ]; then
                 enter_sleep
                 if [ $? -ne 0 ]; then
-                    return 1
+                    return $LINENO
                 elif [ -z "$(pgrep -x swaylock)" ]; then
                     ~/.config/sway/src/backend "lock_session"
                 fi
@@ -70,14 +70,16 @@ function change_wallpaper() {
     done
 
     logger --tag sway --priority user.warn 'backend: unable to load wallpaper. please check `~/Pictures/Wallpaper-Bank/wallpapers` directory permission.'
-    return 1
+    return $LINENO
 }
 
 function lock_session() {
+    if [ -n "$(pgrep -x swaylock)" ]; then return $LINENO; fi
+
     target_splash=$(change_wallpaper)
     if [ $? -ne 0 ]; then
         echo 'unable to load splash image.' >&2
-        return 1
+        return $LINENO
     fi
     swaylock -elfF --clock -i "$target_splash" --grace 5
 
@@ -95,7 +97,7 @@ function enter_sleep() {
     if [ "$1" == 'test' ]; then
         if [ "$(systemctl is-enabled sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target | grep -c static)" -eq 0 ]; then
             logger --tag sway --priority user.notice 'backend: sleep.target was masked. Skipping `enter_sleep` operation.'
-            return 127
+            return 3
         elif ! [ "$(systemctl is-enabled sleep.target)" == 'masked' ]; then
             # NOTE: To change SleepOperation features, please enter below commands and reboot to changes take effect.
             # `echo 'SleepOperation=suspend' | sudo tee /etc/systemd/logind.conf.d/sleep-operation.conf`
@@ -127,9 +129,9 @@ function enter_sleep() {
         enter_sleep 'test'
         if [ $? -eq 0 ]; then
             systemctl sleep
-            if [ $? -ne 0 ]; then return 1; fi
+            if [ $? -ne 0 ]; then return $LINENO; fi
         else
-            return 1
+            return $LINENO
         fi
     fi
 }
@@ -321,8 +323,9 @@ if [ $# -eq 0 ]; then
     exit 127
 else
     "${@}"
-    if [ $? -ne 0 ]; then
-        echo "$0 $@" | swaynag -e bottom -y background -lm "backend: An error ocurred when executing \`$1\`."
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "File $0, line $exit_code, in $@" | swaynag -e bottom -y background -lm "backend: An error ocurred when executing \`$1\`."
     fi
 fi
 ###########################################################
