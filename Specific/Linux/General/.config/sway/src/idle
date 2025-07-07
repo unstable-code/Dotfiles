@@ -26,12 +26,12 @@ swayidle -w \
                 playerctl pause; \
             fi;\
         fi\
-    ' resume 'swaymsg "output * dpms on"'\
+    ' resume 'swaymsg "output * power on"'\
     timeout 180 '\
         if pgrep -x swaylock; then \
             ~/.config/sway/src/backend "enter_sleep";\
         fi\
-    ' resume 'swaymsg "output * dpms on"'
+    ' resume 'swaymsg "output * power on"'
 #     ' resume 'swaymsg "output * dpms on"'\
 #     timeout 300 '\
 #         if [[ $(playerctl status 2> /dev/null) != "Playing" ]]; then\
