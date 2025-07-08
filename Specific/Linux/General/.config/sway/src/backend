@@ -336,7 +336,13 @@ else
     exit_code=$?
     if [ $exit_code -gt 8 ]; then #NOTE: Please update this value if you created or deleted any global variables
         preview=$(cat $0 | nl -b a -n ln | grep -A 4 -B 14 -E "^$(expr $exit_code - 2)" | sed "/$exit_code/s/$/\n ㄴ\t(lldb) [$(date +'%N').$$] \`$1\` function had non-zero exit status/" | sed "/$(expr $exit_code - 2)/s/$/\n ㄴ\t(lldb) [$(date +'%N').$$] BREAKPOINT: exception occurred/")
-        echo -e "File $0, line $(expr $exit_code - 2), in <$@> function\n$preview" | swaynag -e bottom -y background -lm "backend: An error occurred while executing \`$1\` function. reason: $debug_message"
+        which wl-copy &> /dev/null
+        if [ $? -eq 0 ]; then
+            result=$(echo -e "backend: An error occurred while executing \`$1\` function. reason: $debug_message\nFile $0, line $(expr $exit_code - 2), in <$@> function\n$preview" | wl-copy)
+            echo -e "File $0, line $(expr $exit_code - 2), in <$@> function\n$preview" | swaynag -Z 'Copy to clipboard' "$result" -e bottom -y background -lm "backend: An error occurred while executing \`$1\` function. reason: $debug_message"
+        else
+            echo -e "File $0, line $(expr $exit_code - 2), in <$@> function\n$preview" | swaynag -e bottom -y background -lm "backend: An error occurred while executing \`$1\` function. reason: $debug_message"
+        fi
     else
         exit $exit_code
     fi
