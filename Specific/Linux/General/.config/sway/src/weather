@@ -23,7 +23,7 @@ if [ $(cat $lock_file) -eq 0 ]; then
         echo 1 > $lock_file
     fi
 
-    if [ "$(cat $prev_output | awk '{ print $4 }')" == '0.0mm' ]; then
+    if [ $(cat $prev_output | awk '{ print $4 }' | grep -cE '0\.[0-9]mm') -eq 1 ]; then
         cat $prev_output | awk '{ print $1 " " $2 " " $3 " " $5 }' | tee $prev_output
     else
         cat $prev_output | awk '{ print $1 " " $2 " " $3 " " $4 }' | tee $prev_output
