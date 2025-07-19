@@ -32,6 +32,13 @@ function output() {
     elif [ $(cat ~/.config/sway/config.d/startup_list.conf | grep '~/.config/sway/src/idle' | grep -cE '(MASKED|#)') -eq 0 -a $(systemctl is-enabled sleep.target | grep -c 'masked') -eq 1 ]; then
         echo '[ 🖵 ] '
     fi
+    which docker &> /dev/null
+    if [ $? -eq 0 ]; then
+        count=$(docker ps | sed '1d' | wc -l)
+        if [ $count -gt 0 ]; then
+            echo "[ 🖧 $count ] "
+        fi
+    fi
 
     echo '['
     if [ $(pactl list sinks | grep -c Dummy) -ge 1 ]; then
