@@ -38,6 +38,9 @@ else
     elif [ -z "$output" ]; then
         echo "$man_url (-$parse_err)" | tee $prev_output
         echo 0 > $lock_file
+    elif [ -z "$(echo $output | awk '{ print $4 }')" ]; then
+        echo "$man_url (-$parse_err)" | tee $prev_output
+        echo 0 > $lock_file
     else
         if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
             echo $output
