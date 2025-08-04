@@ -38,11 +38,25 @@ function output() {
     if [ $? -eq 0 ]; then
         count=$(docker ps | sed '1d' | wc -l)
         if [ $count -gt 0 ]; then
-            echo "[ 🖧 $count ] "
+            echo "[ 🖧 $count ]"
         fi
     fi
 
-    echo '['
+    if [[ "$(systemctl is-active nordvpn)" == "active" || "$(pgrep -x spoofdpi)" != "" ]]; then
+        echo ' [ 🌐'
+        if [ "$(systemctl is-active nordvpn)" == "active" ]; then
+            echo '🔒'
+        fi
+        if [[ "$(systemctl is-active nordvpn)" == "active" && "$(pgrep -x spoofdpi)" != "" ]]; then
+            echo ' | '
+        fi
+        if ! [ x"$(pgrep -x spoofdpi)" == x ]; then
+            echo '🗡'
+        fi
+        echo ' ]'
+    fi
+
+    echo ' ['
     if [ $(pactl list sinks | grep -c Dummy) -ge 1 ]; then
         echo ' ⚠️ Dummy '
     else
@@ -160,20 +174,6 @@ function output() {
     echo ' ] [ '
     /usr/bin/date +'%Y-%m-%d (%a) %H:%M'
     echo ' ]'
-
-    if [[ "$(systemctl is-active nordvpn)" == "active" || "$(pgrep -x spoofdpi)" != "" ]]; then
-        echo ' [ 🌐'
-        if [ "$(systemctl is-active nordvpn)" == "active" ]; then
-            echo '🔒'
-        fi
-        if [[ "$(systemctl is-active nordvpn)" == "active" && "$(pgrep -x spoofdpi)" != "" ]]; then
-            echo ' | '
-        fi
-        if ! [ x"$(pgrep -x spoofdpi)" == x ]; then
-            echo '🗡'
-        fi
-        echo ' ]'
-    fi
 }
 
 ########    DO NOT CHANGE OR REMOVE BELOW LINES    ########
