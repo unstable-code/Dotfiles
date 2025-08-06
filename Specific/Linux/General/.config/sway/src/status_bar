@@ -1,7 +1,5 @@
 #!/bin/bash
 
-window_title_length=20
-
 function media_progress() {
     if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
         echo ' '
