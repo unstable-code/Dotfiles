@@ -1,6 +1,8 @@
 #!/bin/bash
 
 function media_progress() {
+    playerctl metadata &> /dev/null
+    if [ $? -ne 0 ]; then return; fi
     if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
         echo ' '
         if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
@@ -76,30 +78,33 @@ function output() {
         echo "$(amixer get Master | grep 'Left' | grep '%' | awk '{ print $5 }' | tr -d \[ | tr -d \])"
     fi
 
-    if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
-        echo ' ▶︎ '
-    elif [ "$(playerctl --player playerctld status | grep 'Paused')" == 'Paused' ]; then
-        echo ' ⏸ '
-    fi
+    playerctl metadata &> /dev/null
+    if [ $? -eq 0 ]; then
+        if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
+            echo ' ▶︎ '
+        elif [ "$(playerctl --player playerctld status | grep 'Paused')" == 'Paused' ]; then
+            echo ' ⏸ '
+        fi
 
-    if [ $(playerctl -a status | grep Playing | wc -l) -gt 1 ]; then
-        echo $(playerctl -a status | grep Playing | wc -l)
-    elif [ -z "$(playerctl --player playerctld status | grep -v Stopped)" ]; then
-        echo ''
-    elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
-        echo $(playerctl --player playerctld metadata -f '{{mpris:trackid}}' | sed "s/'//" | awk -F '/' '{ print $3 }')
-        media_progress
-    else
-        if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
-            echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)
+        if [ $(playerctl -a status | grep Playing | wc -l) -gt 1 ]; then
+            echo $(playerctl -a status | grep Playing | wc -l)
+        elif [ -z "$(playerctl --player playerctld status | grep -v Stopped)" ]; then
+            echo ''
+        elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
+            echo $(playerctl --player playerctld metadata -f '{{mpris:trackid}}' | sed "s/'//" | awk -F '/' '{ print $3 }')
             media_progress
         else
-            if [ $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
-                echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $2 }')
+            if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
+                echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)
+                media_progress
             else
-                echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
+                if [ $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
+                    echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $2 }')
+                else
+                    echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
+                fi
+                media_progress
             fi
-            media_progress
         fi
     fi
     echo ' ] ['
@@ -159,7 +164,8 @@ function output() {
     if [ $? -eq 0 ]; then
         echo '[ 🔆 '
         python -c "print($(brightnessctl get) / $(brightnessctl max) * 100)" | cut -d. -f1
-        if [ $(brightnessctl --device='smc::kbd_backlight' get) -gt 0 ]; then
+        kbd_backlight=$(brightnessctl --device='smc::kbd_backlight' get 2> /dev/null)
+        if [ -n "$kbd_backlight" ] && [ $kbd_backlight -gt 0 ]; then
             echo '% | '
             echo $(python -c "print ($(brightnessctl --device='smc::kbd_backlight' get) / $(brightnessctl --device='smc::kbd_backlight' max) * 100)" | cut -d. -f1)%
             echo ' ] '
