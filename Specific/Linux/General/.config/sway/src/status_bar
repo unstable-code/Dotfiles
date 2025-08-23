@@ -23,6 +23,27 @@ function media_progress() {
     fi
 }
 
+function holiday() {
+    today=$(date +'%m%d')
+    if [ $today == '0301' ]; then
+        echo '삼일절'
+    elif [ $today == '0405' ]; then
+        echo '식목일'
+    elif [ $today == '0606' ]; then
+        echo '현충일'
+    elif [ $today == '0717' ]; then
+        echo '제헌절'
+    elif [ $today == '0815' ]; then
+        echo '광복절'
+    elif [ $today == '1003' ]; then
+        echo '개천절'
+    elif [ $today == '1009' ]; then
+        echo '한글날'
+    elif [ $today == '1225' ]; then
+        echo '성탄절'
+    fi
+}
+
 function output() {
     if [ $(cat /sys/class/leds/input*::capslock/brightness | head -n 1) -eq 1 ]; then
         echo '[ ⚠️ CAPS ] '
@@ -176,17 +197,26 @@ function output() {
     echo '[ '
     ~/.config/sway/src/weather
     echo ' ] [ '
-    /usr/bin/date +'%Y-%m-%d (%a) %H:%M'
+    if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+        /usr/bin/date +'%Y-%m-%d (%a) %R'
+    else
+        today=$(holiday)
+        if ! [ x$today == x ]; then
+            /usr/bin/date +"%q/4 %m%d ($(holiday)) %R"
+        else
+            /usr/bin/date +'%q/4 %d %b (%a) %R'
+        fi
+    fi
     echo ' ]'
 }
 
 ########    DO NOT CHANGE OR REMOVE BELOW LINES    ########
 #   This script will not work after changing below code   #
 ###########################################################
-if [ $# -ge 1 -a $# -le 2 ]; then                         #
-    output $@ | tr -d '\n' && echo ''                     #
-else                                                      #
-    echo -e "\e [ error while loading status_bar ] [ provided params: $# / 2 (sensors for CPU | sensors for GPU|FAN.) ] [ $(/usr/bin/date +'%Y-%m-%d (%a) %H:%M') ] \e"
-fi                                                        #
+if [ $# -eq 2 ]; then
+    output $@ | tr -d '\n'
+else
+    echo -e "[ $(swaybar --version) ] [ $0 ] [ An error occurred while loading swaybar ] [ params: $# / 2 <sensors for CPU & sensors for (GPU|FAN)> ] [ $(date) ]"
+fi
 ###########################################################
 
