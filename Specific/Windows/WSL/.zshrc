@@ -112,6 +112,11 @@ wudo() {
     fi
 }
 
+unalias grep
+grep() {
+    /usr/bin/grep $@ --color auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
+}
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -143,6 +148,7 @@ alias "ls"="ls --color=auto --hyperlink=auto -lhF"
 alias "dir"="ls --color=auto --hyperlink=auto -alhF"
 alias "diff"="diff -s"
 alias "ps"="ps -l"
+alias "make"="make -j$(( $(nproc) * 2 ))"
 alias "ㄷ턋"="exit"
 alias zshconfig="vi ~/.zshrc"
 alias vimconfig="vi ~/.vimrc"
@@ -153,6 +159,8 @@ alias reboot="echo \"WSL doesn't support this command. Did you mean 'halt' or 'p
 alias halt="wsl.exe --shutdown"
 alias wsl-update="wsl.exe --update --web-download"
 alias yt-multi="~/.local/bin/YTMultiDown"
+alias calc="julia -E 2> /dev/null"
+alias du="du -d 1"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 set -o vi
