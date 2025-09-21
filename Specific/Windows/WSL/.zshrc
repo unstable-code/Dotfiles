@@ -114,7 +114,7 @@ wudo() {
 
 unalias grep
 grep() {
-    /usr/bin/grep $@ --color auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
+    /usr/bin/grep $@ --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
 }
 
 # User configuration
