@@ -35,6 +35,7 @@ else
     output=$(cat $prev_output)
     if [ $(echo $output | grep -cE '^[A-Za-z]') -gt 0 ]; then
         echo "$man_url (-22)" | tee $prev_output
+        echo 0 > $lock_file
     elif [ -z "$output" ]; then
         echo "$man_url (-$parse_err)" | tee $prev_output
         echo 0 > $lock_file
