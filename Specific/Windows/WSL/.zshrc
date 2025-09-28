@@ -161,6 +161,7 @@ alias wsl-update="wsl.exe --update --web-download"
 alias yt-multi="~/.local/bin/YTMultiDown"
 alias calc="julia -E 2> /dev/null"
 alias du="du -d 1"
+alias gpg="gpg --homedir /mnt/c/Users/HM/.gnupg"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 set -o vi
