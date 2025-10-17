@@ -14,12 +14,15 @@ if [ "$1" == "--reload" -o "$1" == "-r" ]; then
 fi
 
 if [ $(cat $lock_file) -eq 0 ]; then
-    curl -s $target_url > $prev_output
+    curl -sf $target_url -w "%{http_code}\n" > $prev_output
     parse_err=$?
     if [ $parse_err -ne 0 ]; then
+        return=$(cat $prev_output | tail -n 1)
+        [ "$return" != '000' ] && parse_err=$return
         echo "$man_url (-$parse_err)" | tee $prev_output
         exit 1
     else
+        cat $prev_output | head -n 1 | tee $prev_output
         echo 1 > $lock_file
     fi
 
