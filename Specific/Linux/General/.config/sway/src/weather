@@ -29,9 +29,9 @@ if [ $(cat $lock_file) -eq 0 ]; then
         else
             cat $prev_output | awk '{ print $1 " " $2 " " $3 " " $4 }' | tee $prev_output
         fi
-        echo 1 > $lock_file
+        date -d '1 hour' +'%s' > $lock_file
     fi
-elif [ $(cat $lock_file) -ge $(expr $refresh_interval \* 60) ]; then
+elif [ $(date +'%s') -ge $(cat $lock_file) ]; then
     cat $prev_output
     echo 0 > $lock_file
 else
@@ -45,9 +45,8 @@ else
         if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
             cat $prev_output
         else
-            elapsed_time=$(python -c "print($(cat $lock_file) / ($refresh_interval * 60) * 100)" | cut -d. -f1)
+            elapsed_time=$(python -c "print(int((1 - ($(cat $lock_file) - $(date +'%s')) / 3600) * 100))" | cut -d. -f1)
             stat -c "%y" $prev_output | cut -d. -f1 | sed "s/^[0-9][0-9][0-9][0-9]-/🗘 $elapsed_time% /"
         fi
-        echo $(expr $(cat $lock_file) + 1) > $lock_file
     fi
 fi
