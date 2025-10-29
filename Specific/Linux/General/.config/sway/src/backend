@@ -321,7 +321,16 @@ function notify_send() {
         done
         echo "${actions[@]}" | tr ' ' '\n' | rofi -dmenu -lm -p "${args[0]}" -mesg "${args[1]}" | sed 's/=.*//g'
     else
+        dnd=0
+        if [ "$(swaync-client -D)" == "true" ]; then
+            swaync-client -df &> /dev/null
+            dnd=1
+        fi
         notify-send "${flags[@]}" "${args[@]}"
+
+        if [ $dnd -eq 1 ]; then
+            swaync-client -dn &> /dev/null
+        fi
     fi
 }
 
