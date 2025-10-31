@@ -143,7 +143,8 @@ function output() {
             echo $(sensors -u $2 | grep temp1_input | awk '{ print $2 }' | cut -d. -f1)°C
         else
             echo ' | 💾 '
-            free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int(a/m*100)"%"}'
+            free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int((m-a)/m*100)"%"}' # 사용률
+            # free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int(a/m*100)"%"}'   # 가용률
         fi
     else
         echo ' | '
