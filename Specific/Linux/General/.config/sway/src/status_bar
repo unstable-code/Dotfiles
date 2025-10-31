@@ -138,8 +138,13 @@ function output() {
     fi
     which mbpfan &> /dev/null
     if [ $? -ne 0 ]; then
-        echo ' | 🖵 '
-        echo $(sensors -u $2 | grep temp1_input | awk '{ print $2 }' | cut -d. -f1)°C
+        if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+            echo ' | 🖵 '
+            echo $(sensors -u $2 | grep temp1_input | awk '{ print $2 }' | cut -d. -f1)°C
+        else
+            echo ' | 💾 '
+            free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int(a/m*100)"%"}'
+        fi
     else
         echo ' | '
         if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
