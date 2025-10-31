@@ -94,6 +94,10 @@ if [[ "$OMZ_INSTALLED" == "true" ]]; then
     source $ZSH/oh-my-zsh.sh
 fi
 
+if [ -r /usr/share/nvm/init-nvm.sh ]; then
+    source /usr/share/nvm/init-nvm.sh
+fi
+
 aptall() {
     if [ -x ~/.local/bin/updater ]; then
         /bin/bash -c "~/.local/bin/updater $@"
