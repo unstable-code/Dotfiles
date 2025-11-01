@@ -99,8 +99,15 @@ if [ -r /usr/share/nvm/init-nvm.sh ]; then
 fi
 
 aptall() {
-    if [ -x ~/.local/bin/updater ]; then
-        /bin/bash -c "~/.local/bin/updater $@"
+    if [ -x ~/Documents/Release/aptall/aptall.sh ]; then
+        if [ -x ~/.local/bin/updater ]; then
+            /bin/bash -c "~/.local/bin/updater $@"
+        fi
+    elif [ -x /usr/bin/yay ]; then
+        yay -Syu && yay -Yc && yay -Sc --noconfirm
+        if [ -x ~/.local/bin/updater ]; then
+            /bin/bash -c 'SKIP_PACKAGE_UPDATER=true; ~/.local/bin/updater "$@"' -- "$@"
+        fi
     fi
 }
 
