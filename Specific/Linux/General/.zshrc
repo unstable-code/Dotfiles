@@ -101,7 +101,7 @@ fi
 aptall() {
     if [ -x ~/Documents/Release/aptall/aptall.sh ]; then
         if [ -x ~/.local/bin/updater ]; then
-            /bin/bash -c "~/.local/bin/updater $@"
+            /bin/bash -c '~/.local/bin/updater "$@"' -- "$@"
         fi
     elif [ -x /usr/bin/yay ]; then
         yay -Syu && yay -Yc && yay -Sc --noconfirm
