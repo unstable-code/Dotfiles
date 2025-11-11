@@ -216,7 +216,9 @@ function output() {
 ########    DO NOT CHANGE OR REMOVE BELOW LINES    ########
 #   This script will not work after changing below code   #
 ###########################################################
-if [ $# -eq 2 ]; then
+if [ -n "$(pgrep -x swaylock)" ]; then
+    echo ''
+elif [ $# -eq 2 ]; then
     output $@ | tr -d '\n'
 else
     echo -e "[ $(swaybar --version) ] [ $0 ] [ An error occurred while loading swaybar ] [ params: $# / 2 <sensors for CPU & sensors for (GPU|FAN)> ] [ $(date) ]"

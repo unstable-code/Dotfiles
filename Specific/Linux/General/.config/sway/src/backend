@@ -88,7 +88,7 @@ function lock_session() {
         return $LINENO
     fi
 
-    if [ $(ps -ef | grep 'KakaoTalk.exe' | grep -v grep | wc -l) -eq 0 ]; then
+    if [ -z "$(pgrep -x KakaoTalk.exe)" ]; then
         nmcli c down Wired\ connection\ 1
     fi
 
@@ -101,7 +101,7 @@ function lock_session() {
         sleep 1
     done
 
-    if [ $(ps -ef | grep 'KakaoTalk.exe' | grep -v grep | wc -l) -eq 0 ]; then
+    if [ -z "$(pgrep -x KakaoTalk.exe)" ]; then
         nmcli c up Wired\ connection\ 1
     fi
 
