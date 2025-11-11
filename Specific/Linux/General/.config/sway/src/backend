@@ -87,6 +87,11 @@ function lock_session() {
         debug_message='unable to load swaylock wallpaper. Please check `~/Pictures/Wallpaper-Bank/wallpapers` directory permission.'
         return $LINENO
     fi
+
+    if [ $(ps -ef | grep 'KakaoTalk.exe' | grep -v grep | wc -l) -eq 0 ]; then
+        nmcli c down Wired\ connection\ 1
+    fi
+
     swaylock -elfF --clock -i "$target_splash" --grace 5
 
     while :; do
@@ -95,6 +100,10 @@ function lock_session() {
         fi
         sleep 1
     done
+
+    if [ $(ps -ef | grep 'KakaoTalk.exe' | grep -v grep | wc -l) -eq 0 ]; then
+        nmcli c up Wired\ connection\ 1
+    fi
 
     ~/.config/sway/src/weather '--reload'
 }
