@@ -23,6 +23,10 @@ if [ $(cat $lock_file) -eq 0 ]; then
         exit 1
     else
         cat $prev_output | head -n 1 | sed 's/+//g' | tee $prev_output > /dev/null
+        if [ $(cat $prev_output | wc -w) -ne 5 ]; then
+            echo "$man_url (-22)" | tee $prev_output
+            echo 0 > $lock_file
+        fi
 
         if [ $(cat $prev_output | awk '{ print $4 }' | grep -cE '0\.[0-9]mm') -eq 1 ]; then
             cat $prev_output | awk '{ print $1 " " $2 " " $3 " " $5 }' | tee $prev_output
