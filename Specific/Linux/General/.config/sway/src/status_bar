@@ -3,7 +3,7 @@
 function media_progress() {
     playerctl metadata &> /dev/null
     if [ $? -ne 0 ]; then return; fi
-    if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
+    if [ "$(playerctl status | grep 'Playing')" == 'Playing' ]; then
         echo ' '
         if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
             progress=$(python -c "print($(playerctl metadata --format '{{position}}') / $(playerctl metadata --format '{{mpris:length}}') * 100)" | cut -d. -f1)
@@ -101,28 +101,28 @@ function output() {
 
     playerctl metadata &> /dev/null
     if [ $? -eq 0 ]; then
-        if [ "$(playerctl --player playerctld status | grep 'Playing')" == 'Playing' ]; then
+        if [ "$(playerctl status | grep 'Playing')" == 'Playing' ]; then
             echo ' ▶︎ '
-        elif [ "$(playerctl --player playerctld status | grep 'Paused')" == 'Paused' ]; then
+        elif [ "$(playerctl status | grep 'Paused')" == 'Paused' ]; then
             echo ' ⏸ '
+        else
+            echo ' ⏹ '
         fi
 
         if [ $(playerctl -a status | grep Playing | wc -l) -gt 1 ]; then
             echo $(playerctl -a status | grep Playing | wc -l)
-        elif [ -z "$(playerctl --player playerctld status | grep -v Stopped)" ]; then
-            echo ''
-        elif [ -z "$(playerctl --player playerctld metadata -f '{{xesam:url}}')" ]; then
-            echo $(playerctl --player playerctld metadata -f '{{mpris:trackid}}' | sed "s/'//" | awk -F '/' '{ print $3 }')
+        elif [ -z "$(playerctl metadata -f '{{xesam:url}}')" ]; then
+            echo $(playerctl metadata -f '{{mpris:trackid}}' | sed "s/'//" | awk -F '/' '{ print $3 }')
             media_progress
         else
-            if [ "$(playerctl --player playerctld metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
-                echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/^.*\.//')
+            if [ "$(playerctl metadata -f '{{xesam:url}}' | cut -d: -f1)" == 'file' ]; then
+                echo $(playerctl metadata -f '{{xesam:url}}' | sed 's/^.*\.//')
                 media_progress
             else
-                if [ $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
-                    echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $2 }')
+                if [ $(playerctl metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | tr -cd '.' | wc -c) == 2 ]; then
+                    echo $(playerctl metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $2 }')
                 else
-                    echo $(playerctl --player playerctld metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
+                    echo $(playerctl metadata -f '{{xesam:url}}' | sed 's/.*:\/\///' | awk -F '.' '{ print $1 }')
                 fi
                 media_progress
             fi
