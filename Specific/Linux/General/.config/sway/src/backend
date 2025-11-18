@@ -77,6 +77,7 @@ function change_wallpaper() {
 }
 
 function lock_session() {
+    killed_app=0
     if [ -n "$(pgrep -x swaylock)" ]; then
         debug_message='unable to launch swaylock. swaylock is already running.'
         return $LINENO
@@ -90,7 +91,7 @@ function lock_session() {
 
     pkill -x KakaoTalk.exe
     if [ $? -eq 0 ]; then
-        notify_send 'User Session' 'The KakaoTalk was killed due to unsupported airplane mode.'
+        killed_app=1
     fi
 
     nmcli c down Wired\ connection\ 1
@@ -102,6 +103,10 @@ function lock_session() {
         fi
         sleep 1
     done
+
+    if [ $killed_app -eq 1 ]; then
+        notify_send -et 7000 'User Session' 'The KakaoTalk was killed due to unsupported airplane mode.'
+    fi
 
     nmcli c up Wired\ connection\ 1
     ~/.config/sway/src/weather '--reload'
