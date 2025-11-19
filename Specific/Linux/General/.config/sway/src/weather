@@ -21,11 +21,16 @@ if [ $(cat $lock_file) -eq 0 ]; then
         [ "$return" != '000' ] && parse_err=$return
         echo "$man_url (-$parse_err)" | tee $prev_output
         exit 1
+    elif [ $(cat $prev_output | head -n 1 | grep -cE '^[A-Za-z]') -gt 0 ]; then
+        echo "$man_url (-22)" | tee $prev_output
+        echo 0 > $lock_file
+        exit 1
     else
         cat $prev_output | head -n 1 | sed 's/+//g' | tee $prev_output > /dev/null
         if [ $(cat $prev_output | wc -w) -ne 5 ]; then
             echo "$man_url (-22)" | tee $prev_output
             echo 0 > $lock_file
+            exit 1
         fi
 
         if [ $(cat $prev_output | awk '{ print $4 }' | grep -cE '0\.[0-9]mm') -eq 1 ]; then
