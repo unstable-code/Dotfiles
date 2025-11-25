@@ -14,7 +14,7 @@ if [ "$1" == "--reload" -o "$1" == "-r" ]; then
 fi
 
 if [ $(cat $lock_file) -eq 0 ]; then
-    curl -sf $target_url -w "%{http_code}\n" > $prev_output
+    curl -sf --max-time 1 $target_url -w "%{http_code}\n" > $prev_output
     parse_err=$?
     if [ $parse_err -ne 0 ]; then
         return=$(cat $prev_output | tail -n 1)
