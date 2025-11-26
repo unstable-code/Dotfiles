@@ -125,11 +125,11 @@ function enter_sleep() {
             # If you want reject sleep operation, please enter `systemctl mask sleep.target` commands
             # To check current SleepOperation value, please run `systemd-analyze cat-config systemd/logind.conf`
 
-            vailed_target=$(find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//')
-            if [ -n "$vailed_target" -a "$(systemctl is-enabled $vailed_target.target)" == 'masked' ]; then
-                logger --tag sway --priority user.notice "backend: $vailed_target.target was masked. Skipping \`enter_sleep\` operation."
+            valid_target=$(find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//')
+            if [ -n "$valid_target" -a "$(systemctl is-enabled $valid_target.target)" == 'masked' ]; then
+                logger --tag sway --priority user.notice "backend: $valid_target.target was masked. Skipping \`enter_sleep\` operation."
                 return 2
-            elif [ -z "$vailed_target" -a "$(systemctl is-enabled suspend.target)" == 'masked' ]; then
+            elif [ -z "$valid_target" -a "$(systemctl is-enabled suspend.target)" == 'masked' ]; then
                 logger --tag sway --priority user.notice "backend: suspend.target was masked. Skipping \`enter_sleep\` operation."
                 return 2
             fi
