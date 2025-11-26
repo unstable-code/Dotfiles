@@ -365,9 +365,9 @@ else
         else
             echo -e "File $0, line $(expr $exit_code - 2), in <$@> function\n$preview" | swaynag -e bottom -y background -lm "backend: An error occurred while executing \`$1\` function. reason: $debug_message"
         fi
-    else
-        exit $exit_code
     fi
+
+    exit $exit_code
 fi
 ###########################################################
 

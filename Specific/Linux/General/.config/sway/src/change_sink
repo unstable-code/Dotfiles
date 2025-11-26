@@ -96,8 +96,11 @@ if [ $# -eq 0 ]; then
 	exit 127
 else
     "${@}"
-    if [ $? -ne 0 ]; then
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
         echo "$0 $@" | swaynag -e bottom -y background -lm "backend: An error occurred while executing \`$1\`."
     fi
+
+    exit $exit_code
 fi
 ###########################################################
