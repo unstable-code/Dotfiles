@@ -99,9 +99,7 @@ if [ -r /usr/share/nvm/init-nvm.sh ]; then
 fi
 
 aptall() {
-    if [ -x /usr/bin/paru ]; then
-        paru -Syu
-    elif [ -x /usr/bin/yay ]; then
+    if [ -x /usr/bin/yay ]; then
         yay -Syu && yay -Yc && yay -Sc --noconfirm
     fi
     if [ -x ~/.local/bin/updater ]; then
@@ -150,8 +148,6 @@ alias "ㄷ턋"="exit"
 alias zshconfig="vi ~/.zshrc"
 alias vimconfig="vi ~/.config/nvim/init.lua"
 alias tmuxconfig="vi ~/.tmux.conf"
-alias brewall="echo \"$(uname -s) doesn't support this command.\""
-alias yt-multi="~/.local/bin/YTMultiDown"
 alias vi="nvim"
 alias calc="julia -E 2> /dev/null"
 alias du="du -d 1"
