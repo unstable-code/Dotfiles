@@ -94,6 +94,11 @@ function lock_session() {
         killed_app=1
     fi
 
+    pkill -x spotify
+    if [ $? -eq 0 ]; then
+        killed_app=1
+    fi
+
     nmcli c down Wired\ connection\ 1
     swaylock -elfF --clock -i "$target_splash" --grace 5
 
@@ -105,7 +110,7 @@ function lock_session() {
     done
 
     if [ $killed_app -eq 1 ]; then
-        notify_send -et 7000 'User Session' 'The KakaoTalk was killed due to unsupported airplane mode.'
+        notify_send -et 7000 'User Session' 'Some programs were killed due to unsupported airplane mode.'
     fi
 
     nmcli c up Wired\ connection\ 1
