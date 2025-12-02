@@ -77,7 +77,6 @@ function change_wallpaper() {
 }
 
 function lock_session() {
-    killed_app=0
     if [ -n "$(pgrep -x swaylock)" ]; then
         debug_message='unable to launch swaylock. swaylock is already running.'
         return $LINENO
@@ -91,12 +90,16 @@ function lock_session() {
 
     pkill -x KakaoTalk.exe
     if [ $? -eq 0 ]; then
-        killed_app=1
+        killed_app="KakaoTalk"
     fi
 
     pkill -x spotify
     if [ $? -eq 0 ]; then
-        killed_app=1
+        if [ -n "$killed_app" ]; then
+            killed_app="Spotify, $killed_app"
+        else
+            killed_app="Spotify"
+        fi
     fi
 
     nmcli c down Wired\ connection\ 1
@@ -109,8 +112,8 @@ function lock_session() {
         sleep 1
     done
 
-    if [ $killed_app -eq 1 ]; then
-        notify_send -et 7000 'User Session' 'Some programs were killed due to unsupported airplane mode.'
+    if [ -n "$killed_app" ]; then
+        notify_send -et 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
     fi
 
     nmcli c up Wired\ connection\ 1
