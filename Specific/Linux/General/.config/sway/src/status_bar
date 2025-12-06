@@ -63,12 +63,12 @@ function output() {
         fi
     fi
 
-    if [[ "$(systemctl is-active nordvpn)" == "active" || "$(pgrep -x spoofdpi)" != "" ]]; then
+    if [[ "$(pgrep -x openvpn)" != "" || "$(pgrep -x spoofdpi)" != "" ]]; then
         echo ' [ 🌐'
-        if [ "$(systemctl is-active nordvpn)" == "active" ]; then
+        if [ "$(pgrep -x openvpn)" != "" ]; then
             echo '🔒'
         fi
-        if [[ "$(systemctl is-active nordvpn)" == "active" && "$(pgrep -x spoofdpi)" != "" ]]; then
+        if [[ "$(pgrep -x openvpn)" != "" && "$(pgrep -x spoofdpi)" != "" ]]; then
             echo ' | '
         fi
         if ! [ x"$(pgrep -x spoofdpi)" == x ]; then
