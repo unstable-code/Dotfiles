@@ -113,7 +113,7 @@ function lock_session() {
     done
 
     if [ -n "$killed_app" ]; then
-        notify_send -et 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
+        notify_send -t 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
     fi
 
     nmcli c up Wired\ connection\ 1
@@ -199,7 +199,7 @@ function media_controller() {
 
     media_info="$(current_playing_media)"
     if [ $? -ne 0 ]; then
-        notify_send -et 7000 'Media Controller' 'No players found'
+        notify_send -t 7000 'Media Controller' 'No players found'
         return 0
     fi
 
@@ -359,7 +359,7 @@ function notify_send() {
         if [ "$(swaync-client -I)" == "true" ]; then
             swaync-client -Ic &> /dev/null
         fi
-        notify-send "${flags[@]}" "${args[@]}"
+        notify-send -e "${flags[@]}" "${args[@]}"
 
         if [ $verbose -eq 1 ]; then
             sleep 0.15
