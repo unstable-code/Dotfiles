@@ -347,6 +347,9 @@ function notify_send() {
             swaync-client -df &> /dev/null
             dnd=1
         fi
+        if [ "$(swaync-client -I)" == "true" ]; then
+            swaync-client -Ic &> /dev/null
+        fi
         notify-send "${flags[@]}" "${args[@]}"
 
         if [ $dnd -eq 1 ]; then
