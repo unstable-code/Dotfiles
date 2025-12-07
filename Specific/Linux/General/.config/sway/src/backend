@@ -342,7 +342,16 @@ function notify_send() {
         done
         echo "${actions[@]}" | tr ' ' '\n' | rofi -dmenu -lm -p "${args[0]}" -mesg "${args[1]}" | sed 's/=.*//g'
     else
+        LOG=/tmp/sway-session.err
+        verbose=1
         dnd=0
+        if [ $(ps -ef | grep -E '(wlroot|sway -d)' | grep -v grep | wc -l) -ne 2 -o ! -f $LOG ]; then
+            logger --tag sway --priority user.warn 'backend: The sway is not running in verbose logging.'
+            verbose=0
+        fi
+        if [ $verbose -eq 1 ]; then
+            BEFORE=$(wc -l < "$LOG")
+        fi
         if [ "$(swaync-client -D)" == "true" ]; then
             swaync-client -df &> /dev/null
             dnd=1
@@ -351,6 +360,24 @@ function notify_send() {
             swaync-client -Ic &> /dev/null
         fi
         notify-send "${flags[@]}" "${args[@]}"
+
+        if [ $verbose -eq 1 ]; then
+            sleep 0.15
+            AFTER=$(wc -l < "$LOG")
+            NEWLINES=$((AFTER - BEFORE))
+
+            if ! tail -n "$NEWLINES" "$LOG" | grep -q "swaync-notification-window"; then
+                # layer surface attach 로그 없음 → 배너 실패로 간주
+                actions=()
+                for i in "${!flags[@]}"; do
+                    if [[ "${flags[$i]}" == '--action='* ]]; then
+                        convert_action=$(echo "${flags[$i]}" | sed "s/--action=//" | tr ' ' '⠀')
+                        actions+=("$convert_action")
+                    fi
+                done
+                echo "${actions[@]}" | tr ' ' '\n' | rofi -dmenu -lm -p "${args[0]}" -mesg "${args[1]}" | sed 's/=.*//g'
+            fi
+        fi
 
         if [ $dnd -eq 1 ]; then
             swaync-client -dn &> /dev/null
