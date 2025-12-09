@@ -111,6 +111,10 @@ wudo() {
         python3 ~/.shellscript/wsl-sudo/wsl-sudo.py $@
     fi
 }
+``
+if [ -r /usr/share/nvm/init-nvm.sh ]; then
+    source /usr/share/nvm/init-nvm.sh
+fi
 
 unalias grep
 grep() {
