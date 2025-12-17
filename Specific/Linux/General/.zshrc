@@ -100,7 +100,7 @@ fi
 
 aptall() {
     if [ -x /usr/bin/yay ]; then
-        yay -Syu && yay -Yc && yay -Sc --noconfirm
+        yay -Syu
     fi
     if [ -x ~/.local/bin/updater ]; then
         /bin/bash -c '~/.local/bin/updater "$@"' -- "$@"
