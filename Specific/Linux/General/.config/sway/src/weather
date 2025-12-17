@@ -47,6 +47,9 @@ else
     if [ $(cat $prev_output | tail -n 1 | grep -cE '^[0-9][0-9][0-9]') -ne 0 ]; then
         echo "$man_url (-$(echo $(cat $prev_output | tail -n 1 | grep -cE '^[0-9][0-9][0-9]') | tail -n 1 | grep -cE '^[0-9][0-9][0-9]'))" | tee $prev_output
         echo 0 > $lock_file
+    elif [ $(cat $prev_output | head -n 1 | grep -cE '^[A-Za-z]') -gt 0 ]; then
+        echo "$man_url (-22)" | tee $prev_output
+        echo 0 > $lock_file
     elif [ $(file /tmp/widget-sway-weather.log | grep -c empty) -eq 1 ]; then
         echo "$man_url (-22)" | tee $prev_output
         echo 0 > $lock_file
