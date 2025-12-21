@@ -132,7 +132,7 @@ function output() {
     if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
         echo $(sensors -u $1 | grep temp1_input | awk '{ print $2 }' | cut -d. -f1)°C
     else
-        /usr/bin/top -bn1 | grep "Cpu(s)" | awk '{print int($2+$4)"%"}' # CPU 사용률
+        /usr/bin/top -bn1 | grep "Cpu(s)" | awk -v cores=$(nproc) '{print int(($2+$4)*cores)"%"}' # CPU 사용률
         # cat /proc/loadavg | awk '{ print $1 }' # LoA 수치
     fi
     which mbpfan &> /dev/null
