@@ -100,6 +100,10 @@ if [[ "$OMZ_INSTALLED" == "true" ]]; then
     source $ZSH/oh-my-zsh.sh
 fi
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 aptall() {
     if [ -x ~/.local/bin/updater ]; then
         ~/.local/bin/updater $@
@@ -147,13 +151,11 @@ export LC_ALL=en_US.UTF-8
 alias "ls"="ls --color=auto --hyperlink=auto -lhF"
 alias "dir"="ls --color=auto --hyperlink=auto -alhF"
 alias "diff"="diff -s"
-alias "ps"="ps -l"
 alias "make"="make -j$(( $(nproc) * 2 ))"
 alias "ㄷ턋"="exit"
 alias zshconfig="vi ~/.zshrc"
 alias vimconfig="vi ~/.vimrc"
 alias tmuxconfig="vi ~/.tmux.conf"
-alias brewall="echo \"$(uname -s) doesn't support this command.\""
 alias taskmgr="open --explorer /mnt/c/Windows/System32/Taskmgr.exe"
 alias reboot="echo \"WSL doesn't support this command. Did you mean 'halt' or 'powermgr reboot'?\""
 alias halt="wsl.exe --shutdown"
@@ -166,7 +168,3 @@ set -o vi
 
 # bindkey -v
 
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

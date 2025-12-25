@@ -142,7 +142,6 @@ export LC_ALL=en_US.UTF-8
 alias "ls"="ls --color=auto --hyperlink=auto -lhF"
 alias "dir"="ls --color=auto --hyperlink=auto -alhF"
 alias "diff"="diff -s"
-alias "ps"="ps -l"
 alias "make"="make -j$(( $(nproc) * 2 ))"
 alias "ㄷ턋"="exit"
 alias zshconfig="vi ~/.zshrc"
@@ -156,3 +155,4 @@ alias du="du -d 1"
 set -o vi
 
 # bindkey -v
+
