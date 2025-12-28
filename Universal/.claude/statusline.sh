@@ -4,13 +4,14 @@
 input=$(cat)
 
 # ANSI Color codes (note: terminal will render these in dimmed colors)
-CYAN='\033[36m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-RED='\033[31m'
-BLUE='\033[34m'
-MAGENTA='\033[35m'
-RESET='\033[0m'
+CYAN='\e[36m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+RED='\e[31m'
+RED_BLK='\e[31;5m'
+BLUE='\e[34m'
+MAGENTA='\e[35m'
+RESET='\e[0m'
 
 # Extract model display name
 model=$(echo "$input" | jq -r '.model.display_name')
@@ -27,7 +28,9 @@ if [ "$usage" != "null" ]; then
     pct=$((current * 100 / size))
 
     # Color code based on usage percentage
-    if [ "$pct" -ge 70 ]; then
+    if [ "$pct" -ge 80 ]; then
+        ctx_color="$RED_BLK"
+    elif [ "$pct" -ge 70 ]; then
         ctx_color="$RED"
     elif [ "$pct" -ge 55 ]; then
         ctx_color="$MAGENTA"
