@@ -28,15 +28,19 @@ if [ "$usage" != "null" ]; then
 
     # Color code based on usage percentage
     if [ "$pct" -ge 80 ]; then
-        ctx_color="$RED"
+        ctx_color="$MAGENTA"
     elif [ "$pct" -ge 60 ]; then
+        ctx_color="$RED"
+    elif [ "$pct" -ge 40 ]; then
         ctx_color="$YELLOW"
-    else
+    elif [ "$pct" -ge 20 ]; then
         ctx_color="$GREEN"
+    else
+        ctx_color="$CYAN"
     fi
     context_info=$(printf "${ctx_color}%d%%${RESET}" "$pct")
 else
-    context_info=$(printf "${GREEN}0%%${RESET}")
+    context_info=$(printf "${CYAN}0%%${RESET}")
 fi
 
 # Get git status (use --no-optional-locks to avoid lock issues)
