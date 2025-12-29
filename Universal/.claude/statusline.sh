@@ -28,11 +28,11 @@ if [ "$usage" != "null" ]; then
     pct=$((current * 100 / size))
 
     # Color code based on usage percentage
-    if [ "$pct" -ge 80 ]; then
+    if [ "$pct" -ge 75 ]; then
         ctx_color="$RED_BLK"
     elif [ "$pct" -ge 70 ]; then
         ctx_color="$RED"
-    elif [ "$pct" -ge 55 ]; then
+    elif [ "$pct" -ge 60 ]; then
         ctx_color="$MAGENTA"
     elif [ "$pct" -ge 40 ]; then
         ctx_color="$YELLOW"
@@ -41,7 +41,11 @@ if [ "$usage" != "null" ]; then
     else
         ctx_color="$CYAN"
     fi
-    context_info=$(printf "${ctx_color}%d%%${RESET}" "$pct")
+    if [ "$pct" -ge 80 ]; then
+        context_info=$(printf "${ctx_color}??%%${RESET}")
+    else
+        context_info=$(printf "${ctx_color}%d%%${RESET}" "$pct")
+    fi
 else
     context_info=$(printf "${CYAN}0%%${RESET}")
 fi
