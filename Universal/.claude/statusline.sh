@@ -49,7 +49,7 @@ fi
 # Get git status (use --no-optional-locks to avoid lock issues)
 git_info=""
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
-    branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || echo "${RED}detached${RESET}")
+    branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || printf "${RED_BLK}detached${MAGENTA}<%s>${RESET}" "$(git -C "$target_dir" --no-optional-locks rev-parse --short HEAD 2>/dev/null)")
     counts=$(git -C "$cwd" --no-optional-locks rev-list --left-right --count HEAD...@{u} 2>/dev/null)
 
     # Check for changes
