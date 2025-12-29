@@ -49,14 +49,25 @@ fi
 # Get git status (use --no-optional-locks to avoid lock issues)
 git_info=""
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
-    branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || echo "detached")
+    branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || echo "${RED}detached${RESET}")
+    counts=$(git -C "$cwd" --no-optional-locks rev-list --left-right --count HEAD...@{u} 2>/dev/null)
 
     # Check for changes
     if ! git -C "$cwd" --no-optional-locks diff --quiet 2>/dev/null || \
-       ! git -C "$cwd" --no-optional-locks diff --cached --quiet 2>/dev/null; then
+       ! git -C "$cwd" --no-optional-locks diff --cached --quiet 2>/dev/null || \
+       [ -n "$(git -C "$cwd" ls-files --others --exclude-standard | head -n 1)" ]; then
         git_status=$(printf "${RED}*${RESET}")
     else
         git_status=""
+    fi
+
+    if [ -n "$counts" ]; then
+        # 탭 구분을 공백으로 변환하여 배열화
+        read -r ahead behind <<< "$counts"
+
+        [[ "$ahead" -gt 0 ]] && status+=$(printf "${GREEN}↑${ahead}${RESET}")
+        [[ "$behind" -gt 0 ]] && status+=$(printf "${RED}↓${behind}${RESET}")
+        [ -n "$status" ] && git_status=$(printf "%s (%s)" "$git_status" "$status")
     fi
 
     git_info=$(printf " ${YELLOW}[${RESET}git:${MAGENTA}%s${RESET}%s${YELLOW}]${RESET}" "$branch" "$git_status")
