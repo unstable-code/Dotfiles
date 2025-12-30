@@ -2,6 +2,7 @@
 
 # Read JSON input from stdin
 input=$(cat)
+(umask 077 && echo "$input" | jq '.' > /tmp/statusline-debug.json) # 디버그용
 
 # ANSI Color codes (note: terminal will render these in dimmed colors)
 CYAN='\e[36m'
@@ -16,14 +17,18 @@ RESET='\e[0m'
 # Extract model display name
 model=$(echo "$input" | jq -r '.model.display_name')
 
-# Get current directory (basename only)
+# Get current directory & venv name
 cwd=$(echo "$input" | jq -r '.workspace.current_dir')
-dir=$(basename "$cwd")
+if [ -n "$VIRTUAL_ENV" ]; then
+    dir=$(basename "$cwd"):venv
+else
+    dir=$(basename "$cwd")
+fi
 
 # Calculate context usage percentage
 usage=$(echo "$input" | jq '.context_window.current_usage')
 if [ "$usage" != "null" ]; then
-    current=$(echo "$usage" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens')
+    current=$(echo "$usage" | jq '.input_tokens + .output_tokens + .cache_creation_input_tokens + .cache_read_input_tokens')
     size=$(echo "$input" | jq '.context_window.context_window_size')
     pct=$((current * 100 / size))
 
@@ -51,19 +56,25 @@ else
 fi
 
 # Get git status (use --no-optional-locks to avoid lock issues)
-git_info=""
+git_status=""
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
     branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || printf "${RED_BLK}detached${MAGENTA}<%s>${RESET}" "$(git -C "$cwd" --no-optional-locks rev-parse --short HEAD 2>/dev/null)")
     counts=$(git -C "$cwd" --no-optional-locks rev-list --left-right --count HEAD...@{u} 2>/dev/null)
 
     # Check for changes
-    if ! git -C "$cwd" --no-optional-locks diff --quiet 2>/dev/null || \
-       ! git -C "$cwd" --no-optional-locks diff --cached --quiet 2>/dev/null || \
-       [ -n "$(git -C "$cwd" ls-files --others --exclude-standard | head -n 1)" ]; then
-        git_status=$(printf "${RED}*${RESET}")
-    else
-        git_status=""
-    fi
+    staged=$(git -C "$cwd" --no-optional-locks diff --cached --name-status 2>/dev/null | grep -c "^[AM]")
+    deleted=$(git -C "$cwd" --no-optional-locks diff --cached --name-status 2>/dev/null | grep -c "^D")
+    modified=$(git -C "$cwd" --no-optional-locks diff --name-only 2>/dev/null | wc -l)
+    untracked=$(git -C "$cwd" ls-files --others --exclude-standard 2>/dev/null | wc -l)
+    stashed=$(git -C "$cwd" stash list 2> /dev/null | wc -l)
+
+    # 변경사항 문자열 구성
+    [[ $staged -gt 0 ]] && changes+=$(printf "${GREEN}+%d${RESET}" "$staged")
+    [[ $modified -gt 0 ]] && changes+=$(printf "${YELLOW}~%d${RESET}" "$modified")
+    [[ $deleted -gt 0 ]] && changes+=$(printf "${RED}-%d${RESET}" "$deleted")
+    [[ $untracked -gt 0 ]] && changes+=$(printf "${CYAN}?%d${RESET}" "$untracked")
+    [[ $stashed -gt 0 ]] && changes+=$(printf "${BLUE}#%d${RESET}" "$stashed")
+    [ -n "$changes" ] && git_status=$(printf "(%s)" "$changes")
 
     if [ -n "$counts" ]; then
         # 탭 구분을 공백으로 변환하여 배열화
@@ -71,10 +82,16 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
 
         [[ "$ahead" -gt 0 ]] && status+=$(printf "${GREEN}↑${ahead}${RESET}")
         [[ "$behind" -gt 0 ]] && status+=$(printf "${RED}↓${behind}${RESET}")
-        [ -n "$status" ] && git_status=$(printf "%s (%s)" "$git_status" "$status")
+        [ -n "$status" ] && {
+            if [ -n "$git_status" ]; then
+                git_status=$(printf "%s <%s>" "$git_status" "$status")
+            else
+                git_status=$(printf "<%s>" "$status")
+            fi
+        }
     fi
 
-    git_info=$(printf " ${YELLOW}[${RESET}git:${MAGENTA}%s${RESET}%s${YELLOW}]${RESET}" "$branch" "$git_status")
+    git_info=$(printf " ${YELLOW}[${RESET}git:${MAGENTA}%s${RESET} %s${YELLOW}]${RESET}" "$branch" "$git_status")
 fi
 
 # Combine all info with colors
