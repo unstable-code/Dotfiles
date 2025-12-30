@@ -74,7 +74,7 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
     [[ $deleted -gt 0 ]] && changes+=$(printf "${RED}-%d${RESET}" "$deleted")
     [[ $untracked -gt 0 ]] && changes+=$(printf "${CYAN}?%d${RESET}" "$untracked")
     [[ $stashed -gt 0 ]] && changes+=$(printf "${BLUE}#%d${RESET}" "$stashed")
-    [ -n "$changes" ] && git_status=$(printf "(%s)" "$changes")
+    [ -n "$changes" ] && git_status=$(printf " (%s)" "$changes")
 
     if [ -n "$counts" ]; then
         # 탭 구분을 공백으로 변환하여 배열화
@@ -86,12 +86,12 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
             if [ -n "$git_status" ]; then
                 git_status=$(printf "%s <%s>" "$git_status" "$status")
             else
-                git_status=$(printf "<%s>" "$status")
+                git_status=$(printf " <%s>" "$status")
             fi
         }
     fi
 
-    git_info=$(printf " ${YELLOW}[${RESET}git:${MAGENTA}%s${RESET} %s${YELLOW}]${RESET}" "$branch" "$git_status")
+    git_info=$(printf " ${YELLOW}[${RESET}git:${MAGENTA}%s${RESET}%s${YELLOW}]${RESET}" "$branch" "$git_status")
 fi
 
 # Combine all info with colors
