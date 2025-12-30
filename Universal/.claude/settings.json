@@ -1,10 +1,11 @@
 {
-  "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": true
-  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
     "padding": 0
-  }
+  },
+  "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": true
+  },
+  "promptSuggestionEnabled": false
 }
