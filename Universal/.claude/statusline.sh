@@ -95,4 +95,9 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
 fi
 
 # Combine all info with colors
-printf "${CYAN}[${RESET}%s${CYAN}]${RESET}%s ${YELLOW}[${RESET}ctx:%s${YELLOW}]${RESET} ${BLUE}[${RESET}%s${BLUE}]${RESET}" "$dir" "$git_info" "$context_info" "$model"
+which jq &> /dev/null
+if [ $? -eq 0 ]; then
+    printf "${CYAN}[${RESET}%s${CYAN}]${RESET}%s ${YELLOW}[${RESET}ctx:%s${YELLOW}]${RESET} ${BLUE}[${RESET}%s${BLUE}]${RESET}" "$dir" "$git_info" "$context_info" "$model"
+else
+    printf "${CYAN}[${RESET}%s${CYAN}]${RESET}%s ${YELLOW}[${RESET}ctx:%s${YELLOW}]${RESET} ${BLUE}[${RESET}%s${BLUE}]${RESET}" '`jq` not found' "$git_info" 'NaN%' 'N/A'
+fi
