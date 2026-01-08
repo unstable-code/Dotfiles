@@ -149,10 +149,15 @@ function output() {
             # free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int(a/m*100)"%"}'   # 가용률
         fi
     else
-        echo ' |  🪭 '
-        if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+        if [ $(expr $(date +'%S') % 3) -eq 0 ]; then
+            echo ' | 💾 '
+            free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int((m-a)/m*100)"%"}' # 사용률
+            # free | awk 'NR==2{m=$2;a=$7} NR==3{m+=$2;a+=$4} END{print int(a/m*100)"%"}'   # 가용률
+        elif [ $(expr $(date +'%S') % 2) -eq 0 ]; then
+            echo ' |  🪭 '
             echo $(mbpfan get name | cut -c 1-3)
         else
+            echo ' |  🪭 '
             echo $(python -c "print ($(sensors -u $2 | grep fan1_input | awk '{ print $2 }') / $(sensors -u $2 | grep fan1_max | awk '{ print $2 }') * 100)" | cut -d. -f1)%;
         fi
     fi
