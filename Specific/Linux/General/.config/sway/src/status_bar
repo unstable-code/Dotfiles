@@ -145,14 +145,14 @@ function output() {
             echo $(sensors -u $2 | grep temp1_input | awk '{ print $2 }' | cut -d. -f1)°C
         else
             echo ' | 💾 '
-            free | awk 'NR==2{print int(($2-$7)/$2*100)"%"}' # 사용률
-            # free | awk 'NR==2{print int($7/$2*100)"%"}'    # 가용률
+            psi=$(awk '/^some/{split($2,a,"="); print a[2]}' /proc/pressure/memory); [ $(echo "$psi > 0" | bc) -eq 1 ] && echo "!${psi}%" || free | awk 'NR==2{print int(($2-$7)/$2*100)"%"}' # 사용률 (PSI 우선)
+            # psi=$(awk '/^some/{split($2,a,"="); print a[2]}' /proc/pressure/memory); [ $(echo "$psi > 0" | bc) -eq 1 ] && echo "!${psi}%" || free | awk 'NR==2{print int($7/$2*100)"%"}' # 가용률 (PSI 우선)
         fi
     else
         if [ $(expr $(date +'%S') % 3) -eq 0 ]; then
             echo ' | 💾 '
-            free | awk 'NR==2{print int(($2-$7)/$2*100)"%"}' # 사용률
-            # free | awk 'NR==2{print int($7/$2*100)"%"}'    # 가용률
+            psi=$(awk '/^some/{split($2,a,"="); print a[2]}' /proc/pressure/memory); [ $(echo "$psi > 0" | bc) -eq 1 ] && echo "!${psi}%" || free | awk 'NR==2{print int(($2-$7)/$2*100)"%"}' # 사용률 (PSI 우선)
+            # psi=$(awk '/^some/{split($2,a,"="); print a[2]}' /proc/pressure/memory); [ $(echo "$psi > 0" | bc) -eq 1 ] && echo "!${psi}%" || free | awk 'NR==2{print int($7/$2*100)"%"}' # 가용률 (PSI 우선)
         elif [ $(expr $(date +'%S') % 2) -eq 0 ]; then
             echo ' |  🪭 '
             echo $(mbpfan get name | cut -c 1-3)
