@@ -47,7 +47,7 @@ if [ "$usage" != "null" ]; then
         ctx_color="$CYAN"
     fi
     if [ "$pct" -ge 80 ]; then
-        context_info=$(printf "${ctx_color}??%%${RESET}")
+        context_info=$(printf "${ctx_color}LR${RESET}")
     else
         context_info=$(printf "${ctx_color}%d%%${RESET}" "$pct")
     fi
