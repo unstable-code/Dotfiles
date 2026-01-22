@@ -66,8 +66,18 @@ function output() {
         fi
     fi
 
-    if ! [ x"$(pgrep -x spoofdpi)" == x ]; then
-        echo ' [ 🌐🗡 ]'
+    if [[ "$(pgrep -x openvpn)" != "" || "$(pgrep -x spoofdpi)" != "" ]]; then
+        echo ' [ 🌐'
+        if [ "$(pgrep -x openvpn)" != "" ]; then
+            echo '🔒'
+        fi
+        if [[ "$(pgrep -x openvpn)" != "" && "$(pgrep -x spoofdpi)" != "" ]]; then
+            echo ' | '
+        fi
+        if ! [ x"$(pgrep -x spoofdpi)" == x ]; then
+            echo '🗡'
+        fi
+        echo ' ]'
     fi
 
     echo ' ['
