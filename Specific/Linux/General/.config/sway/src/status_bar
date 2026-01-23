@@ -206,8 +206,6 @@ function output() {
         fi
     fi
     echo '[ '
-#   ~/.config/sway/src/weather
-#   echo ' ] [ '
     if [ $(expr $(date +'%S') % 2) -eq 0 ]; then
         /usr/bin/date +'%Y-%m-%d (%a) %R'
     else
