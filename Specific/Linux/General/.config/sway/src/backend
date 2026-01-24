@@ -90,24 +90,24 @@ function lock_session() {
 
     echo "off" > /run/mouse-control.fifo
 
-#   pkill -x KakaoTalk.exe
-#   if [ $? -eq 0 ]; then
-#       killed_app="KakaoTalk"
-#   fi
-#
-#   pkill -x spotify
-#   if [ $? -eq 0 ]; then
-#       if [ -n "$killed_app" ]; then
-#           killed_app="Spotify, $killed_app"
-#       else
-#           killed_app="Spotify"
-#       fi
-#   fi
-#
-#   active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
-#   while IFS= read -r conn; do
-#       [ -n "$conn" ] && nmcli c down "$conn"
-#   done <<< "$active_networks"
+    pkill -x KakaoTalk.exe
+    if [ $? -eq 0 ]; then
+        killed_app="KakaoTalk"
+    fi
+ 
+    pkill -x spotify
+    if [ $? -eq 0 ]; then
+        if [ -n "$killed_app" ]; then
+            killed_app="Spotify, $killed_app"
+        else
+            killed_app="Spotify"
+        fi
+    fi
+ 
+    active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
+    while IFS= read -r conn; do
+        [ -n "$conn" ] && nmcli c down "$conn"
+    done <<< "$active_networks"
 
     swaylock -elfF --clock -i "$target_splash" --grace 5
 
@@ -118,13 +118,13 @@ function lock_session() {
         sleep 1
     done
 
-#   if [ -n "$killed_app" ]; then
-#       notify_send -t 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
-#   fi
-#
-#   while IFS= read -r conn; do
-#       [ -n "$conn" ] && nmcli c up "$conn"
-#   done <<< "$active_networks"
+    if [ -n "$killed_app" ]; then
+        notify_send -t 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
+    fi
+ 
+    while IFS= read -r conn; do
+        [ -n "$conn" ] && nmcli c up "$conn"
+    done <<< "$active_networks"
     echo "on" > /run/mouse-control.fifo
 }
 
