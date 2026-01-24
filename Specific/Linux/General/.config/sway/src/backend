@@ -88,6 +88,8 @@ function lock_session() {
         return $LINENO
     fi
 
+    echo "off" > /run/mouse-control.fifo
+
 #   pkill -x KakaoTalk.exe
 #   if [ $? -eq 0 ]; then
 #       killed_app="KakaoTalk"
@@ -123,6 +125,7 @@ function lock_session() {
 #   while IFS= read -r conn; do
 #       [ -n "$conn" ] && nmcli c up "$conn"
 #   done <<< "$active_networks"
+    echo "on" > /run/mouse-control.fifo
 }
 
 function enter_sleep() {
