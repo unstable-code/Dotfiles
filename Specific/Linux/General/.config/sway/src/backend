@@ -95,14 +95,14 @@ function lock_session() {
         killed_app="KakaoTalk"
     fi
  
-    pkill -x spotify
-    if [ $? -eq 0 ]; then
-        if [ -n "$killed_app" ]; then
-            killed_app="Spotify, $killed_app"
-        else
-            killed_app="Spotify"
-        fi
-    fi
+#   pkill -x spotify
+#   if [ $? -eq 0 ]; then
+#       if [ -n "$killed_app" ]; then
+#           killed_app="Spotify, $killed_app"
+#       else
+#           killed_app="Spotify"
+#       fi
+#   fi
  
     active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
     while IFS= read -r conn; do
