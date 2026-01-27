@@ -95,6 +95,15 @@ function lock_session() {
         killed_app="KakaoTalk"
     fi
  
+    pkill -x openvpn
+    if [ $? -eq 0 ]; then
+        if [ -n "$killed_app" ]; then
+            killed_app="OpenVPN, $killed_app"
+        else
+            killed_app="OpenVPN"
+        fi
+    fi
+
 #   pkill -x spotify
 #   if [ $? -eq 0 ]; then
 #       if [ -n "$killed_app" ]; then
