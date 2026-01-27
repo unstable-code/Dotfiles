@@ -32,3 +32,14 @@ keymap.set('n', '<F5>', ':checktime<CR>', { desc = "파일 변경사항 체크" 
 -- Insert 모드 매핑
 keymap.set('i', 'jj', '<ESC>:w<CR>', { desc = "ESC 후 저장" })
 keymap.set('i', '<F1>', '<ESC>', { desc = "F1으로 ESC" })
+
+-- 마지막 수정 위치 기억
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
