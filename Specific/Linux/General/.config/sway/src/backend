@@ -77,6 +77,9 @@ function change_wallpaper() {
 }
 
 function lock_session() {
+    local killed_app=
+    local busy=0
+
     if [ -n "$(pgrep -x swaylock)" ]; then
         debug_message='unable to launch swaylock. swaylock is already running.'
         return $LINENO
@@ -95,13 +98,9 @@ function lock_session() {
         killed_app="KakaoTalk"
     fi
  
-    pkill -x openvpn
+    pgrep -x openvpn
     if [ $? -eq 0 ]; then
-        if [ -n "$killed_app" ]; then
-            killed_app="OpenVPN, $killed_app"
-        else
-            killed_app="OpenVPN"
-        fi
+        busy=1
     fi
 
 #   pkill -x spotify
@@ -112,11 +111,13 @@ function lock_session() {
 #           killed_app="Spotify"
 #       fi
 #   fi
- 
-    active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
-    while IFS= read -r conn; do
-        [ -n "$conn" ] && nmcli c down "$conn"
-    done <<< "$active_networks"
+
+    if [ $busy -eq 0 ]; then
+        active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
+        while IFS= read -r conn; do
+            [ -n "$conn" ] && nmcli c down "$conn"
+        done <<< "$active_networks"
+    fi
 
     swaylock -elfF --clock -i "$target_splash" --grace 5
 
@@ -131,9 +132,12 @@ function lock_session() {
         notify_send -t 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
     fi
  
-    while IFS= read -r conn; do
-        [ -n "$conn" ] && nmcli c up "$conn"
-    done <<< "$active_networks"
+    if [ $busy -eq 0 ]; then
+        while IFS= read -r conn; do
+            [ -n "$conn" ] && nmcli c up "$conn"
+        done <<< "$active_networks"
+    fi
+
     echo "on" > /run/mouse-control.fifo
 }
 
