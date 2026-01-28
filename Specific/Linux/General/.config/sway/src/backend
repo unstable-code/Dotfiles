@@ -98,12 +98,12 @@ function lock_session() {
         killed_app="KakaoTalk"
     fi
  
-    pgrep -x openvpn
+    pgrep -x openvpn &> /dev/null
     if [ $? -eq 0 ]; then
         busy=1
     fi
 
-    pgrep wg-crypt
+    pgrep wg-crypt &> /dev/null
     if [ $? -eq 0 ]; then
         busy=1
     fi
