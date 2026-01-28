@@ -103,6 +103,11 @@ function lock_session() {
         busy=1
     fi
 
+    pgrep wg-crypt
+    if [ $? -eq 0 ]; then
+        busy=1
+    fi
+
 #   pkill -x spotify
 #   if [ $? -eq 0 ]; then
 #       if [ -n "$killed_app" ]; then
