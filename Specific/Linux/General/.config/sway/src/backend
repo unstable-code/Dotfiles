@@ -77,7 +77,6 @@ function change_wallpaper() {
 }
 
 function lock_session() {
-    local killed_app=
     local busy=0
 
     if [ -n "$(pgrep -x swaylock)" ]; then
@@ -91,12 +90,7 @@ function lock_session() {
         return $LINENO
     fi
 
-    echo "off" > /run/mouse-control.fifo
-
-    pkill -x KakaoTalk.exe
-    if [ $? -eq 0 ]; then
-        killed_app="KakaoTalk"
-    fi
+    [ -p /run/mouse-control.fifo ] && echo "off" > /run/mouse-control.fifo
  
     pgrep -x openvpn &> /dev/null
     if [ $? -eq 0 ]; then
@@ -107,15 +101,6 @@ function lock_session() {
     if [ $? -eq 0 ]; then
         busy=1
     fi
-
-#   pkill -x spotify
-#   if [ $? -eq 0 ]; then
-#       if [ -n "$killed_app" ]; then
-#           killed_app="Spotify, $killed_app"
-#       else
-#           killed_app="Spotify"
-#       fi
-#   fi
 
     if [ $busy -eq 0 ]; then
         active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
@@ -132,10 +117,6 @@ function lock_session() {
         fi
         sleep 1
     done
-
-    if [ -n "$killed_app" ]; then
-        notify_send -t 7000 'User Session' "$killed_app was killed due to unsupported airplane mode."
-    fi
  
     if [ $busy -eq 0 ]; then
         while IFS= read -r conn; do
@@ -143,7 +124,10 @@ function lock_session() {
         done <<< "$active_networks"
     fi
 
-    echo "on" > /run/mouse-control.fifo
+    if [ -p /run/mouse-control.fifo ]; then
+        echo "on" > /run/mouse-control.fifo
+        notify_send -t 7000 'Power Manager' 'Please wait until USB Bus is ready.'
+    fi
 }
 
 function enter_sleep() {
