@@ -8,7 +8,8 @@
     "disableAutoUpdate": false,
     "previewFeatures": true,
     "enablePromptCompletion": true,
-    "systemInstruction": "모든 답변은 반드시 한국어로 작성하세요. 질문이 영어라도 한국어로 답변하세요."
+    "systemInstruction": "모든 답변은 반드시 한국어로 작성하세요. 질문이 영어라도 한국어로 답변하세요.",
+    "enableAutoUpdate": true
   },
   "ui": {
     "showStatusInTitle": true,
