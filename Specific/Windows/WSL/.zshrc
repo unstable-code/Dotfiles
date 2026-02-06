@@ -150,7 +150,7 @@ export LC_ALL=en_US.UTF-8
 # Example aliases
 alias "ls"="ls --color=auto --hyperlink=auto -lhF"
 alias "dir"="ls --color=auto --hyperlink=auto -alhF"
-alias "diff"="diff -s"
+alias "diff"="diff --color -su"
 alias "make"="make -j$(( $(nproc) * 2 ))"
 alias "ㄷ턋"="exit"
 alias zshconfig="vi ~/.zshrc"

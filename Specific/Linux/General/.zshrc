@@ -112,6 +112,17 @@ grep() {
     /usr/bin/grep $@ --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
 }
 
+unalias diff
+diff() {
+    which delta &> /dev/null
+    if [ $? -eq 0 ]; then
+        git diff --no-index $@ | delta --side-by-side
+    else
+        git diff --no-index $@
+        # /usr/bin/diff --color -su $@
+    fi
+}
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -149,7 +160,6 @@ fi
 # Example aliases
 alias "ls"="ls --color=auto --hyperlink=auto -lhF"
 alias "dir"="ls --color=auto --hyperlink=auto -alhF"
-alias "diff"="diff -s"
 alias "make"="make -j$(( $(nproc) * 2 ))"
 alias "ㄷ턋"="exit"
 alias zshconfig="vi ~/.zshrc"
