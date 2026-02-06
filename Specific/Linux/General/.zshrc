@@ -98,6 +98,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+unalias aptall &> /dev/null
+unset aptall &> /dev/null
 aptall() {
     if [ -x /usr/bin/yay ]; then
         yay -Syu
@@ -107,19 +109,21 @@ aptall() {
     fi
 }
 
-unalias grep
+unalias grep &> /dev/null
+unset grep &> /dev/null
 grep() {
-    /usr/bin/grep $@ --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
+    /usr/bin/grep "$@" --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
 }
 
-unalias diff
+unalias diff &> /dev/null
+unset diff &> /dev/null
 diff() {
-    which delta &> /dev/null
-    if [ $? -eq 0 ]; then
-        git diff --no-index $@ | delta --side-by-side
+    if command -v delta &> /dev/null; then
+        git diff --no-index "$@" | delta --side-by-side
+    elif command -v git &> /dev/null; then
+        git diff --no-index "$@"
     else
-        git diff --no-index $@
-        # /usr/bin/diff --color -su $@
+        /usr/bin/diff --color -su "$@"
     fi
 }
 

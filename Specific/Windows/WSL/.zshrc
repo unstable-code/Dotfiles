@@ -104,21 +104,26 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+unalias aptall &> /dev/null
+unset aptall &> /dev/null
 aptall() {
     if [ -x ~/.local/bin/updater ]; then
-        ~/.local/bin/updater $@
+        ~/.local/bin/updater "$@"
     fi
 }
 
+unalias wudo &> /dev/null
+unset wudo &> /dev/null
 wudo() {
     if [ -r ~/.shellscript/wsl-sudo/wsl-sudo.py ]; then
-        python3 ~/.shellscript/wsl-sudo/wsl-sudo.py $@
+        python3 ~/.shellscript/wsl-sudo/wsl-sudo.py "$@"
     fi
 }
 
-unalias grep
+unalias grep &> /dev/null
+unset grep &> /dev/null
 grep() {
-    /usr/bin/grep $@ --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
+    /usr/bin/grep "$@" --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv} | /usr/bin/grep -v grep
 }
 
 # User configuration
