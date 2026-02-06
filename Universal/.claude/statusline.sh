@@ -2,7 +2,7 @@
 
 # Read JSON input from stdin
 input=$(cat)
-(umask 077 && echo "$input" | jq '.' > /tmp/statusline-debug.json) # 디버그용
+(echo "$input" | jq '.' > /run/user/${UID}/statusline-debug.json) # 디버그용
 
 # ANSI Color codes (note: terminal will render these in dimmed colors)
 CYAN='\e[36m'
