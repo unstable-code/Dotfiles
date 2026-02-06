@@ -76,6 +76,15 @@ function change_wallpaper() {
     return $LINENO
 }
 
+function swayidle_init() {
+    killall swayidle &> /dev/null
+    if [ -n "$1" -a "$1" == "start" ]; then
+        swayidle -w \
+            timeout 15 'swaymsg "output * power off"; playerctl pause' \
+            resume 'swaymsg "output * power on"' &> /dev/null &
+    fi
+}
+
 function lock_session() {
     local busy=0
 
@@ -109,6 +118,7 @@ function lock_session() {
         done <<< "$active_networks"
     fi
 
+    swayidle_init "start"
     swaylock -elfF --clock -i "$target_splash" --grace 5
 
     while :; do
@@ -118,6 +128,7 @@ function lock_session() {
         sleep 1
     done
  
+    swayidle_init
     if [ $busy -eq 0 ]; then
         while IFS= read -r conn; do
             [ -n "$conn" ] && nmcli c up "$conn"
