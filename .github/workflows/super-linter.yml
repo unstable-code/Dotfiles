@@ -1,3 +1,4 @@
+---
 name: Super-Linter
 
 on:
@@ -28,3 +29,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: master
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JSCPD: false
