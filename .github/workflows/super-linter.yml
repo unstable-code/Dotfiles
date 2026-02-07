@@ -25,9 +25,11 @@ jobs:
           persist-credentials: false
 
       - name: Super-Linter
-        uses: super-linter/super-linter/slim@0794d929f16e388aa6418cc8a53dd9a7cf298b3e # v8
+        uses: super-linter/super-linter/slim@12562e48d7059cf666c43a4ecb0d3b5a2b31bd9e # v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: master
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_JSCPD: false
+          VALIDATE_BIOME_FORMAT: false
+          VALIDATE_BIOME_LINT: false
