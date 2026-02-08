@@ -148,7 +148,8 @@ export LC_ALL=en_US.UTF-8
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-if [[ "$XDG_CURRENT_DESKTOP" == 'Sway' ]]; then
+export TERM='xterm-256color'
+if [[ "$XDG_CURRENT_DESKTOP" == 'sway:wlroots' ]]; then
     export TERMINAL=foot
 elif [[ "$XDG_CURRENT_DESKTOP" == 'KDE' ]]; then
     export TERMINAL=konsole
