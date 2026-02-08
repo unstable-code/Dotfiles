@@ -3,3 +3,4 @@
 - 만약 node 와 관련된 프로그램을 실행할 경우 `unset NPM_CONFIG_PREFIX && source ~/.nvm/nvm.sh && nvm use default ...` 명령을 실행해야 바이너리를 찾을 수 있어
 - 만약 pip 와 관련된 명령을 실행할 경우 필요한 모듈(종속성 제외)을 `~/.venv` 에 수동으로 설치해야 한다고 노티해줘
 - 만약 chrome-devtools MCP를 사용중에 클릭해도 대상 웹페이지로 이동되지 않으면 탭 리스트를 확인해줘
+- 만약 GitHub가 아닌 GitLab이 원격지 URL 이라면 gh 대신 glab 을 대신 사용해줘
