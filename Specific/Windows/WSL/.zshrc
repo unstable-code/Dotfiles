@@ -107,8 +107,9 @@ export NVM_DIR="$HOME/.nvm"
 unalias aptall &> /dev/null
 unset aptall &> /dev/null
 aptall() {
+    sudo apt update && sudo apt upgrade && sudo apt autoremove --purge && sudo apt clean
     if [ -x ~/.local/bin/updater ]; then
-        ~/.local/bin/updater "$@"
+        ~/.local/bin/updater
     fi
 }
 
