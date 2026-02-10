@@ -10,7 +10,7 @@ if [ -d $HOME/.oh-my-zsh ]; then
 else
     echo -e "\033[33mWarning: oh-my-zsh is currently not installed or executable."
     echo -e "         Therefore some plugins doesn't work probably."
-    echo -e "         Please check $HOME/.oh-my-zsh directory can accessable.\033[m"
+    echo -e "         Please check $HOME/.oh-my-zsh directory can accessible.\033[m"
     autoload -U colors && colors
 fi
 

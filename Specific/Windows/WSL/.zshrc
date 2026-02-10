@@ -10,14 +10,14 @@ if [ -d $HOME/.oh-my-zsh ]; then
 else
     echo -e "\033[33mWarning: oh-my-zsh is currently not installed or executable."
     echo -e "         Therefore some plugins doesn't work probably."
-    echo -e "         Please check $HOME/.oh-my-zsh directory can accessable.\033[m"
+    echo -e "         Please check $HOME/.oh-my-zsh directory can accessible.\033[m"
     autoload -U colors && colors
 fi
 
 if [ ! -d /mnt/c ]; then
     echo -e "\033[31mAttention: Windows volume \"Local Disk (C:)\" is currently not mounted."
     echo -e "           Therefore most functions doesn't work probably."
-    echo -e "           Please check /mnt/c directory can accessable.\033[m"
+    echo -e "           Please check /mnt/c directory can accessible.\033[m"
 fi
 
 # Set name of the theme to load. Optionally, if you set this to "random"
