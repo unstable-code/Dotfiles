@@ -105,7 +105,7 @@ aptall() {
         yay -Syu
     fi
     if [ -x ~/.local/bin/updater ]; then
-        /bin/bash -c '~/.local/bin/updater "$@"' -- "$@"
+        ~/.local/bin/updater
     fi
 }
 
