@@ -7,7 +7,7 @@ swaymsg seat \* hide_cursor 5000
 swaymsg -m -t subscribe '["window"]' | jq --unbuffered -r '.change, .container.app_id' | while read -r event; read -r app_id; do
     # 포커스가 바뀌었을 때 (focus 이벤트)
     if [[ "$event" == "focus" ]]; then
-        if [[ "$app_id" == "com.moonlight_stream.Moonlight" ]]; then
+        if [[ "$app_id" == "com.moonlight_stream.Moonlight" || "$app_id" == "virt-manager" ]]; then
             # Moonlight 창으로 들어오면 커서 숨김 해제
             swaymsg seat \* hide_cursor when-typing disable
             swaymsg seat \* hide_cursor 0
