@@ -5,7 +5,7 @@ debug_message=
 
 # This script will helps you without reload your sway program after below codes changed.
 # NOTE: If you want remove or declare new variable, please edit exception handling function at below.
-# NOTE: `status_command` will not work properly. Please write theese settings in configuration file.
+# NOTE: `status_command` will not work properly. Please write these settings in configuration file.
 
 function logout() {
     input=$(notify_send --action='1=󰍃' 'Logout' 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.')
