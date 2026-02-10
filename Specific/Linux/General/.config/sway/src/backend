@@ -100,23 +100,6 @@ function lock_session() {
     fi
 
     [ -p /run/mouse-control.fifo ] && echo "off" > /run/mouse-control.fifo
- 
-    pgrep -x openvpn &> /dev/null
-    if [ $? -eq 0 ]; then
-        busy=1
-    fi
-
-    pgrep wg-crypt &> /dev/null
-    if [ $? -eq 0 ]; then
-        busy=1
-    fi
-
-    if [ $busy -eq 0 ]; then
-        active_networks=$(nmcli -t -f NAME,TYPE connection show --active | grep -E ':802-11-wireless|:802-3-ethernet' | cut -d: -f1)
-        while IFS= read -r conn; do
-            [ -n "$conn" ] && nmcli c down "$conn"
-        done <<< "$active_networks"
-    fi
 
     swayidle_init "start"
     swaylock -elfF --clock -i "$target_splash" --grace 5
@@ -127,18 +110,13 @@ function lock_session() {
         fi
         sleep 1
     done
- 
-    swayidle_init
-    if [ $busy -eq 0 ]; then
-        while IFS= read -r conn; do
-            [ -n "$conn" ] && nmcli c up "$conn"
-        done <<< "$active_networks"
-    fi
 
     if [ -p /run/mouse-control.fifo ]; then
         echo "on" > /run/mouse-control.fifo
         notify_send -t 7000 'Power Manager' 'Please wait until USB Bus is ready.'
     fi
+
+    swayidle_init
 }
 
 function enter_sleep() {
