@@ -175,7 +175,3 @@ alias calc="julia -E 2> /dev/null"
 alias du="du -d 1"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-set -o vi
-
-# bindkey -v
-
