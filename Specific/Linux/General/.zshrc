@@ -127,6 +127,24 @@ diff() {
     fi
 }
 
+unalias ssh &> /dev/null
+unset ssh &> /dev/null
+function ssh() {
+    #NOTE: Please set background and foreground colors in your remote environments.
+    # if [ -n "$SSH_CONNECTION" ]; then
+    #     printf "\e]11;#002b36\a"  # Solarized Dark 배경
+    #     printf "\e]10;#839496\a"  # Solarized Dark 글자
+    #     printf "\e]11;#2b0000\a"
+    #     printf "\e]10;#ffffff\a"
+    # fi
+
+    /usr/bin/ssh "$@"
+
+    # reset to default background colors
+    printf "\e]111\a"
+    printf "\e]110\a"
+}
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
