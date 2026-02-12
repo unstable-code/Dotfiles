@@ -1,0 +1,6 @@
+[system-distro-env]
+; 분수 단위 DPI를 끄고 정수 스케일링을 강제합니다.
+WESTON_RDP_DISABLE_FRACTIONAL_HI_DPI=true
+
+; WSLg가 윈도우의 DPI 설정을 무시하고 강제로 2배 크게 그리게 합니다.
+WESTON_RDP_DEBUG_DESKTOP_SCALING_FACTOR=200
