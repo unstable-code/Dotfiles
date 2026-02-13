@@ -102,7 +102,7 @@ function lock_session() {
     [ -p /run/mouse-control.fifo ] && echo "off" > /run/mouse-control.fifo
 
     swayidle_init "start"
-    if [ "$SWAYLOCK_PRIVACY_ENGAGE" == "true" ]; then
+    if [ -f "$XDG_RUNTIME_DIR/swaylock-privacy" ]; then
         swaylock -elF --clock -S --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 5
     else
         swaylock -elF --clock -i "$target_splash" --grace 5
