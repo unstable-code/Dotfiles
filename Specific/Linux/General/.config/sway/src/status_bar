@@ -54,12 +54,8 @@ function output() {
     if [ -r /tmp/reboot-recommended ]; then
         echo '[ ↻ ] '
     fi
-    if [ $(cat ~/.config/sway/config.d/startup_list.conf | grep '~/.config/sway/src/idle' | grep -cE '(MASKED|#)') -eq 1 -a $(systemctl is-enabled sleep.target | grep -c 'masked') -eq 1 ]; then
+    if [ -r $XDG_RUNTIME_DIR/swaylock-privacy ]; then
         echo '[ 👁 ] '
-    elif [ $(cat ~/.config/sway/config.d/startup_list.conf | grep '~/.config/sway/src/idle' | grep -cE '(MASKED|#)') -eq 1 -a $(systemctl is-enabled sleep.target | grep -c 'masked') -eq 0 ]; then
-        echo '[ 💤 ] '
-    elif [ $(cat ~/.config/sway/config.d/startup_list.conf | grep '~/.config/sway/src/idle' | grep -cE '(MASKED|#)') -eq 0 -a $(systemctl is-enabled sleep.target | grep -c 'masked') -eq 1 ]; then
-        echo '[ 🖵 ] '
     fi
     which docker &> /dev/null
     if [ $? -eq 0 ]; then
