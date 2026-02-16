@@ -2,6 +2,13 @@
 
 source ~/.local/share/wayland-scripts/backend
 
+function apply_wallpaper() {
+    local path=$(change_wallpaper)
+    if [ $? -ne 0 ]; then return $LINENO; fi
+    swww img "$path"
+    matugen image "$path" -m dark
+}
+
 function logout() {
     input=$(notify_send --action='1=󰍃' 'Logout' 'You pressed the exit shortcut. Do you really want to exit Hyprland? This will end your Wayland session.')
     if [[ -n $input && $input -eq 1 ]]; then

@@ -5,6 +5,7 @@
 @define-color background-alpha rgba(40, 42, 54, 0.8);
 @define-color accent rgba(189, 147, 249, 0.8);
 @define-color current-line rgb(68, 71, 90);
+@define-color current-line-alpha rgba(68, 71, 90, 0.75);
 @define-color comment rgb(98, 114, 164);
 
 .notification-row {
@@ -98,7 +99,7 @@
   padding: 4px;
   margin: 0;
   box-shadow: none;
-  background: @current-line;
+  background: @current-line-alpha;
   border: 2px solid @accent;
   color: @foreground;
 }
@@ -106,6 +107,11 @@
 .notification-default-action:hover,
 .notification-action:hover {
   -gtk-icon-effect: none;
+  background: @current-line;
+}
+
+.notification-row:focus .notification-default-action,
+.notification-row:hover .notification-default-action {
   background: @current-line;
 }
 

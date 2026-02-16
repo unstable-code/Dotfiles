@@ -1,0 +1,11 @@
+configuration {
+    modi: "drun,filebrowser,run,window";
+    show-icons: true;
+    display-drun: "Apps";
+    display-run: "Run";
+    display-filebrowser: "Files";
+    display-window: "Windows";
+    font: "JetBrainsMono Nerd Font 13";
+}
+
+@theme "themes/material"

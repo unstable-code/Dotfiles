@@ -9,3 +9,10 @@ tabs.xml
 *.tmp
 *.log
 *tmp*
+
+# matugen generated files
+**/colors-matugen.*
+
+# per-machine configs
+**/waybar/rules/
+**/hypr/rules/

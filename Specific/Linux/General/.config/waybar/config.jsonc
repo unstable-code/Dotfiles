@@ -117,9 +117,10 @@
     },
 
     "custom/cpu": {
-        "exec": "/usr/bin/top -bn1 | grep 'Cpu(s)' | awk -v cores=$(nproc) '{print int(($2+$4)*cores)}'",
+        "exec": "cores=$(nproc); usage=$(/usr/bin/top -bn1 | grep 'Cpu(s)' | awk -v c=$cores '{print int(($2+$4)*c)}'); class=; [ $usage -ge $((cores*50)) ] && class=warning; [ $usage -ge $((cores*85)) ] && class=critical; echo \"{\\\"text\\\":\\\"$usage%\\\",\\\"class\\\":\\\"$class\\\"}\"",
+        "return-type": "json",
         "interval": 2,
-        "format": " {}%"
+        "format": "󰍛 {}"
     },
 
     // temperature#cpu.hwmon-path 및 temperature#gpu.hwmon-path 는
@@ -145,7 +146,7 @@
 
     "memory": {
         "interval": 2,
-        "format": "󰍛 {percentage}%"
+        "format": "󰊚 {percentage}%"
     },
 
     "custom/memory-psi": {

@@ -1,17 +1,11 @@
 /* JaKooLit-inspired Translucent style */
 
+@import "colors-matugen.css";
+
+/* Fixed functional colors (independent of matugen) */
 @define-color critical #ff0000;
 @define-color warning #f3f809;
-@define-color fgcolor #ffffff;
-@define-color bgcolor #222436;
 @define-color alert   #df3320;
-
-@define-color accent1 #ff7a93;  /* cpu, keyboard */
-@define-color accent2 #b9f27c;  /* clock */
-@define-color accent3 #ff9e64;  /* memory, network */
-@define-color accent4 #bb9af7;  /* pulseaudio */
-@define-color accent5 #7da6ff;  /* battery, disk */
-@define-color accent6 #0db9d7;  /* temperature */
 
 * {
     font-family: "JetBrainsMono Nerd Font", "Noto Sans KR", monospace;
@@ -22,7 +16,7 @@
 
 window#waybar {
     background-color: rgba(0, 0, 0, 0.3);
-    color: @fgcolor;
+    color: @on_surface;
     transition-property: background-color;
     transition-duration: 0.5s;
     border-radius: 10px;
@@ -76,7 +70,7 @@ tooltip {
 }
 
 #workspaces button.active {
-    color: @fgcolor;
+    color: @on_surface;
     background: rgba(255, 255, 255, 0.15);
 }
 
@@ -97,14 +91,14 @@ tooltip {
 /* --- Alert modules (left side) --- */
 #custom-capslock {
     background-color: @alert;
-    color: @fgcolor;
+    color: @on_surface;
     border-radius: 6px;
     font-weight: bold;
 }
 
 #custom-recording {
     background-color: @critical;
-    color: @fgcolor;
+    color: @on_surface;
     border-radius: 6px;
 }
 
@@ -113,20 +107,20 @@ tooltip {
 }
 
 #custom-privacy {
-    color: @accent4;
+    color: @tertiary_container;
 }
 
 #custom-docker {
-    color: @accent6;
+    color: @secondary_container;
 }
 
 #custom-vpn {
-    color: @accent2;
+    color: @tertiary;
 }
 
 /* --- Audio --- */
 #pulseaudio {
-    color: @accent4;
+    color: @tertiary_container;
 }
 
 #pulseaudio.muted {
@@ -135,16 +129,24 @@ tooltip {
 
 /* --- Media --- */
 #custom-media {
-    color: @accent2;
+    color: @tertiary;
 }
 
 /* --- CPU & Temperature --- */
 #custom-cpu {
-    color: @accent1;
+    color: @primary;
+}
+
+#custom-cpu.warning {
+    color: @warning;
+}
+
+#custom-cpu.critical {
+    color: @critical;
 }
 
 #temperature {
-    color: @accent6;
+    color: @secondary_container;
 }
 
 #temperature.critical {
@@ -153,12 +155,12 @@ tooltip {
 
 /* --- Fan --- */
 #custom-fan {
-    color: @accent6;
+    color: @secondary_container;
 }
 
 /* --- Memory --- */
 #memory {
-    color: @accent3;
+    color: @secondary;
 }
 
 #custom-memory-psi {
@@ -168,7 +170,7 @@ tooltip {
 
 /* --- Battery --- */
 #battery {
-    color: @accent5;
+    color: @primary_container;
 }
 
 #battery.warning {
@@ -186,7 +188,7 @@ tooltip {
 
 @keyframes blink {
     to {
-        background-color: @fgcolor;
+        background-color: @on_surface;
         color: #333333;
     }
 }
@@ -198,12 +200,12 @@ tooltip {
 
 /* --- Clock --- */
 #clock {
-    color: @accent2;
+    color: @tertiary;
 }
 
 /* --- Holiday --- */
 #custom-holiday {
-    color: @accent1;
+    color: @primary;
 }
 
 /* --- Tray --- */

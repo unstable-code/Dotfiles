@@ -1,0 +1,12 @@
+[config]
+set_wallpaper = false
+color_scheme = "scheme-tonal-spot"
+
+[templates.rofi-colors]
+input_path = "~/.config/matugen/templates/rofi-colors.rasi"
+output_path = "~/.config/rofi/colors-matugen.rasi"
+
+[templates.waybar-colors]
+input_path = "~/.config/matugen/templates/waybar-colors.css"
+output_path = "~/.config/waybar/colors-matugen.css"
+post_hook = "pkill -SIGUSR2 waybar"

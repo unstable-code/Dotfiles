@@ -1,0 +1,96 @@
+@import "../colors-matugen.rasi"
+
+/* Color mapping */
+* {
+    bg: var(surface);
+    bg-alt: var(surface-container);
+    fg: var(on-surface);
+    fg-alt: var(on-surface-variant);
+    accent: var(primary);
+    accent-bg: var(primary-container);
+    accent-fg: var(on-primary-container);
+    urgent: var(error);
+    border-color: var(outline-variant);
+}
+
+/* Layout */
+window {
+    width: 35%;
+    border: 2px;
+    border-color: @border-color;
+    border-radius: 10px;
+    background-color: @bg;
+}
+
+mainbox { background-color: transparent; }
+
+inputbar {
+    padding: 8px 12px;
+    background-color: @bg-alt;
+    border-radius: 8px;
+    margin: 8px;
+    children: [prompt, entry];
+}
+
+prompt {
+    text-color: @accent;
+    background-color: transparent;
+    margin: 0 8px 0 0;
+}
+
+entry {
+    text-color: @fg;
+    background-color: transparent;
+    placeholder: "Search...";
+    placeholder-color: @fg-alt;
+}
+
+listview {
+    lines: 8;
+    columns: 1;
+    spacing: 4px;
+    padding: 4px 8px;
+    background-color: transparent;
+}
+
+element {
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: transparent;
+    text-color: @fg;
+}
+
+element selected {
+    background-color: @accent-bg;
+    text-color: @accent-fg;
+}
+
+element-icon {
+    size: 24px;
+    margin: 0 8px 0 0;
+    background-color: transparent;
+}
+
+element-text {
+    vertical-align: 0.5;
+    background-color: transparent;
+    text-color: inherit;
+}
+
+mode-switcher {
+    padding: 4px 8px;
+    background-color: @bg-alt;
+    spacing: 4px;
+}
+
+button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background-color: transparent;
+    text-color: @fg-alt;
+}
+
+button selected {
+    background-color: @accent;
+    text-color: var(on-primary);
+}
