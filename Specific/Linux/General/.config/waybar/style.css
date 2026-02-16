@@ -1,0 +1,220 @@
+/* JaKooLit-inspired Translucent style */
+
+@define-color critical #ff0000;
+@define-color warning #f3f809;
+@define-color fgcolor #ffffff;
+@define-color bgcolor #222436;
+@define-color alert   #df3320;
+
+@define-color accent1 #ff7a93;  /* cpu, keyboard */
+@define-color accent2 #b9f27c;  /* clock */
+@define-color accent3 #ff9e64;  /* memory, network */
+@define-color accent4 #bb9af7;  /* pulseaudio */
+@define-color accent5 #7da6ff;  /* battery, disk */
+@define-color accent6 #0db9d7;  /* temperature */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans KR", monospace;
+    font-weight: bold;
+    min-height: 0;
+    font-size: 13px;
+}
+
+window#waybar {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: @fgcolor;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    border-radius: 10px;
+}
+
+window#waybar.hidden {
+    opacity: 0.1;
+}
+
+tooltip {
+    background: #1e1e2e;
+    opacity: 0.8;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #11111b;
+}
+
+/* --- Common module padding --- */
+#custom-capslock,
+#custom-recording,
+#custom-reboot,
+#custom-privacy,
+#custom-docker,
+#custom-vpn,
+#pulseaudio,
+#custom-media,
+#custom-cpu,
+#temperature,
+#custom-fan,
+#memory,
+#custom-memory-psi,
+#battery,
+#backlight,
+#clock,
+#custom-holiday,
+#tray {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: 6px;
+    padding-left: 6px;
+}
+
+/* --- Workspaces --- */
+#workspaces button {
+    padding: 2px 6px;
+    color: #606060;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+}
+
+#workspaces button.active {
+    color: @fgcolor;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#workspaces button.urgent {
+    color: @critical;
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Separators --- */
+#custom-separator {
+    color: #606060;
+    padding: 0 2px;
+}
+
+/* --- Alert modules (left side) --- */
+#custom-capslock {
+    background-color: @alert;
+    color: @fgcolor;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+#custom-recording {
+    background-color: @critical;
+    color: @fgcolor;
+    border-radius: 6px;
+}
+
+#custom-reboot {
+    color: @warning;
+}
+
+#custom-privacy {
+    color: @accent4;
+}
+
+#custom-docker {
+    color: @accent6;
+}
+
+#custom-vpn {
+    color: @accent2;
+}
+
+/* --- Audio --- */
+#pulseaudio {
+    color: @accent4;
+}
+
+#pulseaudio.muted {
+    color: #888888;
+}
+
+/* --- Media --- */
+#custom-media {
+    color: @accent2;
+}
+
+/* --- CPU & Temperature --- */
+#custom-cpu {
+    color: @accent1;
+}
+
+#temperature {
+    color: @accent6;
+}
+
+#temperature.critical {
+    color: @critical;
+}
+
+/* --- Fan --- */
+#custom-fan {
+    color: @accent6;
+}
+
+/* --- Memory --- */
+#memory {
+    color: @accent3;
+}
+
+#custom-memory-psi {
+    color: @critical;
+    font-weight: bold;
+}
+
+/* --- Battery --- */
+#battery {
+    color: @accent5;
+}
+
+#battery.warning {
+    color: @warning;
+}
+
+#battery.critical:not(.charging) {
+    color: @critical;
+    animation-name: blink;
+    animation-duration: 3s;
+    animation-timing-function: steps(12);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes blink {
+    to {
+        background-color: @fgcolor;
+        color: #333333;
+    }
+}
+
+/* --- Backlight --- */
+#backlight {
+    color: #cdd6f4;
+}
+
+/* --- Clock --- */
+#clock {
+    color: @accent2;
+}
+
+/* --- Holiday --- */
+#custom-holiday {
+    color: @accent1;
+}
+
+/* --- Tray --- */
+#tray {
+    padding: 0 6px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}

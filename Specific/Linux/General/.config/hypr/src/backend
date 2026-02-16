@@ -1,0 +1,57 @@
+#!/bin/bash
+
+source ~/.local/share/wayland-scripts/backend
+
+function logout() {
+    input=$(notify_send --action='1=󰍃' 'Logout' 'You pressed the exit shortcut. Do you really want to exit Hyprland? This will end your Wayland session.')
+    if [[ -n $input && $input -eq 1 ]]; then
+        hyprctl dispatch exit
+    fi
+}
+
+function hypridle_init() {
+    killall hypridle &> /dev/null
+    if [ -n "$1" -a "$1" == "start" ]; then
+        hypridle -c ~/.config/hypr/hypridle.conf &> /dev/null &
+    fi
+}
+
+function lock_session() {
+    if [ -n "$(pgrep -x hyprlock)" ]; then return; fi
+
+    target_splash=$(change_wallpaper)
+
+    [ -p /run/mouse-control.fifo ] && echo "off" > /run/mouse-control.fifo
+
+    hypridle_init "start"
+    if [ -f "$XDG_RUNTIME_DIR/lock-privacy" ]; then
+        hyprlock --config ~/.config/hypr/hyprlock-privacy.conf
+    else
+        HYPRLOCK_BG="$target_splash" hyprlock --config ~/.config/hypr/hyprlock.conf
+    fi
+
+    if [ -p /run/mouse-control.fifo ]; then
+        echo "on" > /run/mouse-control.fifo
+        notify_send -t 7000 'Power Manager' 'Please wait until USB Bus is ready.'
+    fi
+
+    hypridle_init
+}
+
+########    DO NOT CHANGE OR REMOVE BELOW LINES    ########
+#   This script will not work after changing below code   #
+###########################################################
+if [ $# -eq 0 ]; then
+    echo "usage: $0 <function [options]>" >&2
+    exit 127
+else
+    "${@}"
+    exit_code=$?
+    if [ $exit_code -gt 0 ]; then
+        source ~/.local/share/wayland-scripts/stack_trace
+        gui_error_handler "$exit_code" "$1" "$0" "$debug_message" "${@:2}"
+    fi
+
+    exit $exit_code
+fi
+###########################################################

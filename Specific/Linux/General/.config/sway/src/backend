@@ -1,7 +1,6 @@
 #!/bin/bash
 
-term=foot
-debug_message=
+source ~/.local/share/wayland-scripts/backend
 
 # This script will helps you without reload your sway program after below codes changed.
 # NOTE: If you want remove or declare new variable, please edit exception handling function at below.
@@ -12,68 +11,6 @@ function logout() {
     if [[ -n $input && $input -eq 1 ]]; then
         swaymsg exit
     fi
-}
-
-function power() {
-    enter_sleep 'test'
-    if [ $? -ne 3 ]; then
-        input=$(notify_send --action='1=⏾' --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
-    else
-        input=$(notify_send --action='2=⏻' --action='3=↺' 'Power' 'You pressed the power button. Do you really want to exit sway? This will end your Wayland session.')
-    fi
-
-    if [[ -n $input && $input -eq 1 ]]; then
-        enter_sleep 'test'
-        target=$?
-        if [ $target -eq 0 ]; then
-            input=$(notify_send --action="0=Mask sleep.target" --action="1=$(enter_sleep 'current')" 'Power' 'Configuring sleep function.')
-            if [ $input -eq 1 ]; then
-                enter_sleep
-                if [ $? -ne 0 ]; then
-                    debug_message="unable to enter $(enter_sleep 'current'). Please check system configuration to resolve this issue."
-                    return $LINENO
-                elif [ -z "$(pgrep -x swaylock)" ]; then
-                    ~/.config/sway/src/backend "lock_session"
-                fi
-            fi
-        elif [ $target -eq 1 ]; then
-            input=$(notify_send --action="1=Unmask sleep.target" 'Power' 'unable to run sleep operation. reason: sleep.target was masked.')
-        elif [ $target -eq 2 ]; then
-            input=$(notify_send --action="1=Unmask $(enter_sleep 'current').target" 'Power' "unable to run sleep operation. reason: $(enter_sleep 'current').target was masked.")
-        fi
-        if [[ -n $input && $input -eq 1 ]]; then
-            if [ $target -eq 1 ]; then
-                $term -F sudo systemctl unmask sleep.target
-                power
-            elif [ $target -eq 2 ]; then
-                $term -F sudo systemctl unmask $(enter_sleep 'current').target
-                power
-            fi
-        elif [[ -n $input && $input -eq 0 ]]; then
-            $term -F sudo systemctl mask sleep.target
-        fi
-    elif [[ -n $input && $input -eq 2 ]]; then
-        poweroff
-    elif [[ -n $input && $input -eq 3 ]]; then
-        reboot
-    fi
-}
-
-function change_wallpaper() {
-    tries=3
-    while [ $tries -ge 0 ]; do
-        target_splash="$(find ~/Pictures/Wallpaper-Bank/wallpapers -type f | shuf -n 1)"
-        if [ -n "$target_splash" ]; then
-            echo "$target_splash"
-            return 0
-        else
-            tries=$(expr $tries - 1)
-            sleep 1
-        fi
-    done
-
-    debug_message='unable to load swaybg wallpaper. Please check `~/Pictures/Wallpaper-Bank/wallpapers` directory permission.'
-    return $LINENO
 }
 
 function swayidle_init() {
@@ -102,7 +39,7 @@ function lock_session() {
     [ -p /run/mouse-control.fifo ] && echo "off" > /run/mouse-control.fifo
 
     swayidle_init "start"
-    if [ -f "$XDG_RUNTIME_DIR/swaylock-privacy" ]; then
+    if [ -f "$XDG_RUNTIME_DIR/lock-privacy" ]; then
         swaylock -elF --clock -S --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 5
     else
         swaylock -elF --clock -i "$target_splash" --grace 5
@@ -116,246 +53,6 @@ function lock_session() {
     swayidle_init
 }
 
-function enter_sleep() {
-    if [ "$1" == 'test' ]; then
-        if [ "$(systemctl is-enabled sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target | grep -c static)" -eq 0 ]; then
-            logger --tag sway --priority user.notice 'backend: sleep.target was masked. Skipping `enter_sleep` operation.'
-            return 3
-        elif ! [ "$(systemctl is-enabled sleep.target)" == 'masked' ]; then
-            # NOTE: To change SleepOperation features, please enter below commands and reboot to changes take effect.
-            # `echo 'SleepOperation=suspend' | sudo tee /etc/systemd/logind.conf.d/sleep-operation.conf`
-            # applicable sleep targets in SleepOperation: suspend, suspend-then-hibernate, hibernate, hybrid-sleep
-            # Any Handle*Key configs will not changes take effect in this `enter_sleep` function
-            # If you want reject sleep operation, please enter `systemctl mask sleep.target` commands
-            # To check current SleepOperation value, please run `systemd-analyze cat-config systemd/logind.conf`
-
-            valid_target=$(find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//')
-            if [ -n "$valid_target" -a "$(systemctl is-enabled $valid_target.target)" == 'masked' ]; then
-                logger --tag sway --priority user.notice "backend: $valid_target.target was masked. Skipping \`enter_sleep\` operation."
-                return 2
-            elif [ -z "$valid_target" -a "$(systemctl is-enabled suspend.target)" == 'masked' ]; then
-                logger --tag sway --priority user.notice "backend: suspend.target was masked. Skipping \`enter_sleep\` operation."
-                return 2
-            fi
-        else
-            logger --tag sway --priority user.notice 'backend: sleep.target was masked. Skipping `enter_sleep` operation.'
-            return 1
-        fi
-    elif [ "$1" == 'current' ]; then
-        result=$(find /etc/systemd -type f -exec grep '^SleepOperation' {} \; | sed 's/SleepOperation=//')
-        if [ -z "$result" ]; then
-            echo 'suspend'
-        else
-            echo $result
-        fi
-    else
-        enter_sleep 'test'
-        if [ $? -eq 0 ]; then
-            systemctl sleep
-            if [ $? -ne 0 ]; then
-                debug_message="unable to enter $(enter_sleep 'current'). unknown error occurred."
-                return $LINENO
-            fi
-        else
-            debug_message="unable to enter $(enter_sleep 'current'). Please check system configuration to resolve this issue."
-            return $LINENO
-        fi
-    fi
-}
-
-function current_sink_status() {
-    if [ $(pactl list sinks | grep Active | grep -c headphones) -eq 1 ]; then echo '🎧'; fi
-    if [ $(amixer get Master | grep 'Left' | grep '%' | awk '{ print $6 }' | tr -d \[ | tr -d \]) == 'on' ]; then echo '🔊'; else echo '🔈'; fi
-    amixer get Master | grep 'Left' | grep '%' | awk '{ print $5 }' | tr -d \[ | tr -d \]
-}
-
-function current_playing_media() {
-    if [ -z "$(playerctl --player playerctld status)" ]; then
-        return 1
-    fi
-
-    current_sink_status
-    echo -n 'Now'
-    if [ $(playerctl --player playerctld status | grep -c 'Playing') -eq 1 ]; then echo '▶︎'; elif [ $(playerctl --player playerctld status | grep -c 'Paused') -eq 1 ]; then echo '⏸'; else echo '■'; fi
-
-    if [ $(playerctl -a status | grep Playing | wc -l) -gt 1 ]; then
-        playerctl -a status | grep Playing | wc -l
-    else
-        playerctl --player playerctld metadata -f '{{xesam:title}}' | cut -d: -f1
-        playerctl --player playerctld metadata -f '{{xesam:album}}' | cut -d: -f1
-        playerctl --player playerctld metadata -f '{{xesam:artist}}' | cut -d: -f1
-    fi
-}
-
-function media_controller() {
-    if [ -z "$1" ]; then
-        echo "usage: $0 media_controller <options>" >&2
-        return 1
-    fi
-
-    media_info="$(current_playing_media)"
-    if [ $? -ne 0 ]; then
-        notify_send -t 7000 'Media Controller' 'No players found'
-        return 0
-    fi
-
-    if [ $(playerctl -a status | grep -v Stopped | wc -l) -gt 1 ]; then
-        if [ "$1" == "notify" ]; then
-            input=$(notify_send --action='1=⏮' --action="2=⏯" --action='3=⏭' 'Media Controller' "$media_info")
-            if [[ -n $input ]]; then
-                if [ $input -eq 1 ]; then
-                    mode='⏮'
-                elif [ $input -eq 2 ]; then
-                    mode='⏯'
-                elif [ $input -eq 3 ]; then
-                    mode='⏭'
-                fi
-            fi
-        elif [ "$1" == "default" ]; then
-            mode='⏯'
-            input=2
-        fi
-        if [ -z $input ]; then
-            return 0
-        fi
-
-        if [ "$1" == "notify" ]; then
-            target_input=$(echo -e "$(if [ $(playerctl -a status | grep -v Stopped | wc -l) -gt 1 ]; then echo 'ALL\n'; fi)$(playerctl -a metadata --format '{{playerName}}: {{status}} [{{duration(position)}}/{{duration(mpris:length)}}]')" | rofi -dmenu -p "Pressed $mode button" | awk -F ':' '{ print $1 }')
-            if [ -z $target_input ]; then
-                return 0
-            fi
-
-            if [[ -n $input && $input -eq 1 ]]; then
-                if [ "$target_input" == 'ALL' ]; then
-                    playerctl -a previous
-                else
-                    playerctl -p $target_input previous
-                fi
-            elif [[ -n $input && $input -eq 2 ]]; then
-                if [ "$target_input" == 'ALL' ]; then
-                    playerctl -a play-pause
-                else
-                    playerctl -p $target_input play-pause
-                fi
-            elif [[ -n $input && $input -eq 3 ]]; then
-                if [ "$target_input" == 'ALL' ]; then
-                    playerctl -a next
-                else
-                    playerctl -p $target_input next
-                fi
-            fi
-        else
-            playerctl play-pause
-        fi
-    else
-        if [ "$1" == "notify" ]; then
-            input=$(notify_send --action='1=⏮' --action="2=$(if [ $(playerctl --player playerctld status) == 'Playing' ]; then echo '⏸'; else echo '⏵'; fi)" --action='3=⏭' 'Media Controller' "$media_info")
-        elif [ "$1" == "default" ]; then
-            input=2
-        fi
-        if [[ -n $input && $input -eq 1 ]]; then
-            playerctl previous
-        elif [[ -n $input && $input -eq 2 ]]; then
-            playerctl play-pause
-        elif [[ -n $input && $input -eq 3 ]]; then
-            playerctl next
-        fi
-    fi
-}
-
-function sinks_controller() {
-    if [ $(~/.config/sway/src/change_sink 'check_current_state' 'sinks') -gt 1 -a $(~/.config/sway/src/change_sink 'check_current_state' 'inputs') -gt 0 ]; then
-        input=$(notify_send --action='0=Sinks' --action='1=Volume' --action="2=$(if [ $(amixer get Master | grep 'Left' | grep '%' | awk '{ print $6 }' | tr -d \[ | tr -d \]) == 'on' ]; then echo 'Mute'; else echo 'UnMute'; fi)" --action='3=pavucontrol' 'Volume Control' "$(current_sink_status && pactl get-default-sink)")
-        if [[ -n $input && $input -eq 0 ]]; then
-            input=$(notify_send --action='1=Default Sinks' --action='2=Source Output' 'Sinks Controller' 'Change output source or Default sink')
-            if [[ -n $input && $input -eq 1 ]]; then
-                ~/.config/sway/src/change_sink 'default'
-            elif [[ -n $input && $input -eq 2 ]]; then
-                ~/.config/sway/src/change_sink 'per_source'
-            fi
-        elif [[ -n $input && $input -eq 1 ]]; then
-            ~/.config/sway/src/change_sink 'change_sink_volumes'
-        elif [[ -n $input && $input -eq 2 ]]; then
-            ~/.config/sway/src/change_sink 'sink_mute_toggles'
-        elif [[ -n $input && $input -eq 3 ]]; then
-            pavucontrol
-        fi
-    elif [ $(~/.config/sway/src/change_sink 'check_current_state' 'sinks') -gt 1 ]; then
-        input=$(notify_send --action='0=Sinks' --action='1=Volume' --action="2=$(if [ $(amixer get Master | grep 'Left' | grep '%' | awk '{ print $6 }' | tr -d \[ | tr -d \]) == 'on' ]; then echo 'Mute'; else echo 'UnMute'; fi)" --action='3=pavucontrol' 'Volume Control' "$(current_sink_status && pactl get-default-sink)")
-        if [[ -n $input && $input -eq 0 ]]; then
-            ~/.config/sway/src/change_sink 'default'
-        elif [[ -n $input && $input -eq 1 ]]; then
-            ~/.config/sway/src/change_sink 'change_sink_volumes'
-        elif [[ -n $input && $input -eq 2 ]]; then
-            ~/.config/sway/src/change_sink 'sink_mute_toggles'
-        elif [[ -n $input && $input -eq 3 ]]; then
-            pavucontrol
-        fi
-    else
-        input=$(notify_send --action='1=Volume' --action="2=$(if [ $(amixer get Master | grep 'Left' | grep '%' | awk '{ print $6 }' | tr -d \[ | tr -d \]) == 'on' ]; then echo 'Mute'; else echo 'UnMute'; fi)" --action='3=pavucontrol' 'Volume Control' "$(current_sink_status && pactl get-default-sink)")
-        if [[ -n $input && $input -eq 1 ]]; then
-            ~/.config/sway/src/change_sink 'change_sink_volumes'
-        elif [[ -n $input && $input -eq 2 ]]; then
-            ~/.config/sway/src/change_sink 'sink_mute_toggles'
-        elif [[ -n $input && $input -eq 3 ]]; then
-            pavucontrol
-        fi
-    fi
-}
-
-function notify_send() {
-    params=("${@}")
-    args=()
-    flags=()
-
-    if [ $# -eq 0 ]; then
-        echo "usage: $0 notify_send <args1 [args2 args3 ...]>" >&2
-        return 1
-    fi
-
-    for i in "${!params[@]}"; do
-        if [[ "${params[$i]}" != "-"* ]]; then
-            args+=("${params[$i]}")
-        else
-            flags+=("${params[$i]}")
-        fi
-    done
-
-    pgrep -x swaync &> /dev/null
-    if [ $? -ne 0 ]; then
-        which swaync &> /dev/null
-        if [ $? -ne 0 ]; then
-            logger --tag sway --priority user.err 'backend: The swaync does not installed yet. replacing alternative notify-send protocols.'
-        else
-            logger --tag sway --priority user.warn 'backend: The swaync does not running. replacing alternative notify-send protocols.'
-        fi
-        actions=()
-        for i in "${!flags[@]}"; do
-            if [[ "${flags[$i]}" == '--action='* ]]; then
-                convert_action=$(echo "${flags[$i]}" | sed "s/--action=//" | tr ' ' '⠀')
-                actions+=("$convert_action")
-            fi
-        done
-        echo "${actions[@]}" | tr ' ' '\n' | rofi -dmenu -lm -p "${args[0]}" -mesg "${args[1]}" | sed 's/=.*//g'
-    else
-        dnd=0
-        if [ "$(swaync-client -D)" == "true" ]; then
-            swaync-client -df &> /dev/null
-            dnd=1
-        fi
-        if [ "$(swaync-client -I)" == "true" ]; then
-            swaync-client -Ic &> /dev/null
-        fi
-        systemctl --user reset-failed swaync.service
-        systemctl restart --user swaync
-        notify-send "${flags[@]}" "${args[@]}"
-
-        if [ $dnd -eq 1 ]; then
-            swaync-client -dn &> /dev/null
-        fi
-    fi
-}
-
 ########    DO NOT CHANGE OR REMOVE BELOW LINES    ########
 #   This script will not work after changing below code   #
 ###########################################################
@@ -366,12 +63,10 @@ else
     "${@}"
     exit_code=$?
     if [ $exit_code -gt 0 ]; then
-        readonly SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-        source "${SRC_DIR}/stack_trace"
+        source ~/.local/share/wayland-scripts/stack_trace
         gui_error_handler "$exit_code" "$1" "$0" "$debug_message" "${@:2}"
     fi
 
     exit $exit_code
 fi
 ###########################################################
-

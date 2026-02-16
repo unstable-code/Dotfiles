@@ -1,0 +1,29 @@
+#!/bin/bash
+
+function gui_error_handler() {
+    local exit_code=$1
+    local func_name=$2
+    local script_path=$3
+    local debug_msg=$4
+    shift 4
+    local args="$@"
+
+    if [ $exit_code -eq 0 ]; then return; fi
+
+    local error_line=$exit_code
+    local preview
+    preview=$(sed -n "$((error_line - 10)),$((error_line + 5))p" "$script_path" | \
+              nl -ba -v $((error_line - 10)) | \
+              sed "/${error_line}/s/$/\n ㄴ\t(lldb) BREAKPOINT: exception occurred/")
+
+    local summary="backend: An error occurred while executing \`$func_name\` function. reason: $debug_msg"
+    local full_report="File $script_path, line $error_line, in <$func_name $args> function\n\n$preview"
+
+    export ERROR_PAYLOAD="$full_report"
+    if which wl-copy &> /dev/null; then
+        notify-send -u critical "$summary" "$(echo -e "$full_report" | head -5)"
+        echo -e "$full_report" | wl-copy
+    else
+        notify-send -u critical "$summary" "$(echo -e "$full_report" | head -5)"
+    fi
+}

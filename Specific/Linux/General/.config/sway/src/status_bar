@@ -54,7 +54,7 @@ function output() {
     if [ -r /tmp/reboot-recommended ]; then
         echo '[ ↻ ] '
     fi
-    if [ -r $XDG_RUNTIME_DIR/swaylock-privacy ]; then
+    if [ -r $XDG_RUNTIME_DIR/lock-privacy ]; then
         echo '[ 👁 ] '
     fi
     which docker &> /dev/null
@@ -84,7 +84,7 @@ function output() {
         echo ' ⚠️ Dummy '
     else
         if [ $(pactl list sinks short | wc -l) -gt 1 ]; then
-            echo " $(~/.config/sway/src/change_sink 'current_source')"
+            echo " $(~/.local/share/wayland-scripts/change_sink 'current_source')"
         else
             if [ $(pactl list sinks | grep Active | grep -c headphones) -eq 1 ]; then
                 echo ' 🎧 '

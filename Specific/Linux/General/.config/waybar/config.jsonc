@@ -1,0 +1,190 @@
+{
+    "include": ["~/.config/waybar/rules/sensors.jsonc"],
+    "layer": "top",
+    "position": "top",
+    "exclusive": true,
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "margin-left": 6,
+    "margin-right": 6,
+    "margin-top": 2,
+
+    "modules-left": [
+        "hyprland/workspaces",
+        "custom/separator#dot-line",
+        "custom/capslock",
+        "custom/recording",
+        "custom/reboot",
+        "custom/privacy",
+        "custom/docker",
+        "custom/vpn",
+        "custom/media"
+    ],
+    "modules-center": [
+        "clock",
+        "custom/holiday"
+    ],
+    "modules-right": [
+        "pulseaudio",
+        "custom/separator#dot-line",
+        "custom/cpu",
+        "temperature#cpu",
+        "custom/separator#dot-line",
+        "temperature#gpu",
+        "custom/fan",
+        "custom/separator#dot-line",
+        "memory",
+        "custom/memory-psi",
+        "custom/separator#dot-line",
+        "battery",
+        "backlight",
+        "custom/separator#dot-line",
+        "tray"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "on-click": "activate",
+        "sort-by-number": true,
+        "active-only": false,
+        "all-outputs": true
+    },
+
+    "custom/separator#dot-line": {
+        "format": "|",
+        "interval": "once",
+        "tooltip": false
+    },
+
+    "custom/capslock": {
+        "exec": "echo ' CAPS'",
+        "interval": 1,
+        "exec-if": "[ $(cat /sys/class/leds/input*::capslock/brightness | head -n 1) -eq 1 ]"
+    },
+
+    "custom/recording": {
+        "exec": "echo ' REC'",
+        "interval": 2,
+        "exec-if": "pgrep -x wf-recorder"
+    },
+
+    "custom/reboot": {
+        "exec": "echo ''",
+        "interval": 30,
+        "exec-if": "[ -r /tmp/reboot-recommended ]",
+        "format": " {}"
+    },
+
+    "custom/privacy": {
+        "exec": "echo on",
+        "interval": 5,
+        "exec-if": "[ -f $XDG_RUNTIME_DIR/lock-privacy ]",
+        "format": "󰈈"
+    },
+
+    "custom/docker": {
+        "exec": "docker ps --format '{{.ID}}' 2>/dev/null | wc -l",
+        "interval": 10,
+        "exec-if": "which docker &>/dev/null && [ $(docker ps --format '{{.ID}}' 2>/dev/null | wc -l) -gt 0 ]",
+        "format": "󰡨 {}"
+    },
+
+    "custom/vpn": {
+        "exec-if": "pgrep -x openvpn || pgrep -x spoofdpi",
+        "exec": "echo -n ''; [ -n \"$(pgrep -x openvpn)\" ] && echo -n '󰌾'; [ -n \"$(pgrep -x openvpn)\" ] && [ -n \"$(pgrep -x spoofdpi)\" ] && echo -n ' '; [ -n \"$(pgrep -x spoofdpi)\" ] && echo -n '󱡂'",
+        "interval": 5,
+        "format": "󰖂 {}"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 {volume}%",
+        "format-icons": {
+            "headphone": "󰋋",
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "~/.config/hypr/src/backend sinks_controller",
+        "on-click-right": "pavucontrol"
+    },
+
+    "custom/media": {
+        "exec": "playerctl metadata -f '{{xesam:title}}' 2>/dev/null | cut -c1-30",
+        "interval": 2,
+        "exec-if": "playerctl status 2>/dev/null | grep -qE 'Playing|Paused'",
+        "on-click": "~/.config/hypr/src/backend media_controller notify",
+        "on-click-right": "playerctl play-pause",
+        "format": "󰎈 {}"
+    },
+
+    "custom/cpu": {
+        "exec": "/usr/bin/top -bn1 | grep 'Cpu(s)' | awk -v cores=$(nproc) '{print int(($2+$4)*cores)}'",
+        "interval": 2,
+        "format": " {}%"
+    },
+
+    // temperature#cpu.hwmon-path 및 temperature#gpu.hwmon-path 는
+    // per-machine 설정 ~/.config/waybar/rules/sensors.jsonc 에서 오버라이드
+    "temperature#cpu": {
+        "interval": 2,
+        "format": "{temperatureC}°C",
+        "critical-threshold": 80
+    },
+
+    "temperature#gpu": {
+        "interval": 2,
+        "format": "󰢮 {temperatureC}°C",
+        "critical-threshold": 90
+    },
+
+    // custom/fan: mbpfan 또는 센서 칩의 fan1_input/fan1_max 백분율 표시
+    // temperature#gpu와 동일한 센서 칩 사용 — per-machine sensors.jsonc에서 exec 오버라이드
+    "custom/fan": {
+        "interval": 2,
+        "format": "󰈐 {}"
+    },
+
+    "memory": {
+        "interval": 2,
+        "format": "󰍛 {percentage}%"
+    },
+
+    "custom/memory-psi": {
+        "exec": "awk '/^some/{split($2,a,\"=\"); print a[2]}' /proc/pressure/memory",
+        "interval": 5,
+        "exec-if": "[ $(echo \"$(awk '/^some/{split($2,a,\"=\"); print a[2]}' /proc/pressure/memory) > 0\" | bc) -eq 1 ]",
+        "format": "!{}%"
+    },
+
+    "battery": {
+        "states": {
+            "critical": 10,
+            "warning": 20
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-full": "",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "interval": 5
+    },
+
+    "backlight": {
+        "format": "󰃠 {percent}%"
+    },
+
+    "clock": {
+        "interval": 1,
+        "format": " {:%Y-%m-%d (%a) %H:%M}",
+        "tooltip-format": "{:%Y-%m-%d %H:%M:%S}"
+    },
+
+    "custom/holiday": {
+        "exec": "~/.config/waybar/scripts/holiday.sh",
+        "interval": 3600,
+        "exec-if": "[ -n \"$(~/.config/waybar/scripts/holiday.sh)\" ]"
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 5
+    }
+}
