@@ -38,6 +38,7 @@ tooltip {
 /* --- Common module padding --- */
 #custom-capslock,
 #custom-recording,
+#submap,
 #custom-reboot,
 #custom-privacy,
 #custom-docker,
@@ -100,6 +101,13 @@ tooltip {
     background-color: @critical;
     color: @on_surface;
     border-radius: 6px;
+}
+
+#submap {
+    background-color: @warning;
+    color: #000000;
+    border-radius: 6px;
+    font-weight: bold;
 }
 
 #custom-reboot {

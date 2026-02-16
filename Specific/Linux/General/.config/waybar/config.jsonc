@@ -14,6 +14,7 @@
         "custom/separator#dot-line",
         "custom/capslock",
         "custom/recording",
+        "hyprland/submap",
         "custom/reboot",
         "custom/privacy",
         "custom/docker",
@@ -48,6 +49,11 @@
         "sort-by-number": true,
         "active-only": false,
         "all-outputs": true
+    },
+
+    "hyprland/submap": {
+        "format": "󰌐 {}",
+        "tooltip": false
     },
 
     "custom/separator#dot-line": {
