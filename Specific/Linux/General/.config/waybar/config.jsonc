@@ -1,13 +1,13 @@
 {
     "include": ["~/.config/waybar/rules/sensors.jsonc"],
     "layer": "top",
-    "position": "top",
+    "position": "bottom",
     "exclusive": true,
     "passthrough": false,
     "gtk-layer-shell": true,
     "margin-left": 6,
     "margin-right": 6,
-    "margin-top": 2,
+    "margin-bottom": 2,
 
     "modules-left": [
         "hyprland/workspaces",
