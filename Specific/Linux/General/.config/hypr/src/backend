@@ -39,7 +39,7 @@ function lock_session() {
 
     if [ -p /run/mouse-control.fifo ]; then
         echo "on" > /run/mouse-control.fifo
-        notify_send -t 7000 'Power Manager' 'Please wait until USB Bus is ready.'
+        notify_send -t 5000 'Power Manager' 'Please wait until USB Bus is ready.'
     fi
 
     hypridle_init
