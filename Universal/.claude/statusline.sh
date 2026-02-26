@@ -67,13 +67,14 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
     modified=$(git -C "$cwd" --no-optional-locks diff --name-only 2>/dev/null | wc -l)
     untracked=$(git -C "$cwd" ls-files --others --exclude-standard 2>/dev/null | wc -l)
     stashed=$(git -C "$cwd" stash list 2> /dev/null | wc -l)
+    diffs=$(git -C "$cwd" rev-parse --verify origin/HEAD >/dev/null 2>&1 && git -C "$cwd" log --oneline origin/HEAD..HEAD | wc -l || echo 0)
 
     # 변경사항 문자열 구성
     [[ $staged -gt 0 ]] && changes+=$(printf "${GREEN}+%d${RESET}" "$staged")
     [[ $modified -gt 0 ]] && changes+=$(printf "${YELLOW}~%d${RESET}" "$modified")
     [[ $deleted -gt 0 ]] && changes+=$(printf "${RED}-%d${RESET}" "$deleted")
     [[ $untracked -gt 0 ]] && changes+=$(printf "${CYAN}?%d${RESET}" "$untracked")
-    [[ $stashed -gt 0 ]] && changes+=$(printf "${BLUE}#%d${RESET}" "$stashed")
+    [[ $stashed -gt 0 ]] && changes+=$(printf "${BLUE}≡%d${RESET}" "$stashed")
     [ -n "$changes" ] && git_status=$(printf " (%s)" "$changes")
 
     if [ -n "$counts" ]; then
@@ -81,7 +82,9 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
         read -r ahead behind <<< "$counts"
 
         [[ "$ahead" -gt 0 ]] && status+=$(printf "${GREEN}↑${ahead}${RESET}")
+        [[ "$ahead" -gt 0 && "$behind" -gt 0 ]] && status+=$(printf "${RED_BLK}⇄${RESET}")
         [[ "$behind" -gt 0 ]] && status+=$(printf "${RED}↓${behind}${RESET}")
+        [[ $diffs -gt 0 ]] && status+=$(printf "${MAGENTA}Δ%d${RESET}" "$diffs")
         [ -n "$status" ] && {
             if [ -n "$git_status" ]; then
                 git_status=$(printf "%s <%s>" "$git_status" "$status")
