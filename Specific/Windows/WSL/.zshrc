@@ -187,6 +187,7 @@ alias halt="wsl.exe --shutdown"
 alias wsl-update="wsl.exe --update --web-download"
 alias calc="julia -E 2> /dev/null"
 alias du="du -d 1"
+alias trim="wl-paste | sed -E 's/[[:space:][:blank:]]+$//' | wl-copy"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 if [[ -x /usr/bin/dircolors ]]; then
